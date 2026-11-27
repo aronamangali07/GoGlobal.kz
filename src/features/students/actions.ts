@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireSession } from "@/lib/data/session";
+import { onEventScheduled } from "@/lib/notify/events";
 
 async function staff() {
   const s = await requireSession();
@@ -39,10 +40,11 @@ export async function createEvent(raw: unknown) {
   const v = eventSchema.safeParse(raw);
   if (!v.success) return { ok: false, error: "invalid" };
   const { supabase, user } = await staff();
-  const { error } = await supabase.from("events").insert({
+  const { data: ev, error } = await supabase.from("events").insert({
     user_id: v.data.userId, program_id: v.data.programId, type: v.data.type, title: v.data.title,
     starts_at: v.data.startsAt, address: v.data.address, notes: v.data.notes, created_by: user.id,
-  });
+  }).select("id").single();
+  if (ev) await onEventScheduled(ev.id);
   done(v.data.userId);
   return { ok: !error, error: error ? "generic" : undefined };
 }

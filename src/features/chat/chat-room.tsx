@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { TZ } from "@/features/offers/format";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+import { notifyNewMessage } from "./actions";
 
 export type ChatMessage = { id: string; sender_id: string; body: string; created_at: string; read_at: string | null };
 
@@ -71,6 +72,8 @@ export function ChatRoom({
       setMessages((prev) => prev.filter((m) => m.id !== id));
       setText(body);
       toast.error(t("error"));
+    } else {
+      notifyNewMessage(id).catch(() => {});
     }
     setSending(false);
   };

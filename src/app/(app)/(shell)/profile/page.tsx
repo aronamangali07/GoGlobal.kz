@@ -38,6 +38,7 @@ export default async function ProfilePage() {
           program_ids: programIds,
           preferences: (profile.preferences ?? {}) as Preferences,
           telegram_connected: !!profile.telegram_chat_id,
+          telegram_username: profile.telegram_username,
         }}
       />
     </div>

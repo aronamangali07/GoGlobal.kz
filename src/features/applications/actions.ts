@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireSession } from "@/lib/data/session";
+import { onApplicationCreated } from "@/lib/notify/events";
 
 export type ApplyResult = { ok: true; applicationId: string } | { ok: false; error: string };
 
@@ -14,6 +15,7 @@ export async function applyToOffer(offerId: string): Promise<ApplyResult> {
   const { supabase } = await requireSession();
   const { data, error } = await supabase.rpc("apply_to_offer", { p_offer_id: id });
   if (error || !data) return { ok: false, error: code(error?.message) };
+  await onApplicationCreated(data);
   revalidatePath("/offers");
   revalidatePath("/dashboard");
   return { ok: true, applicationId: data };

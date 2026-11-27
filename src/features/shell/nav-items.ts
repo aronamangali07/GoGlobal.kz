@@ -1,4 +1,4 @@
-import { CalendarDays, Compass, FileCheck2, House, LayoutGrid, MessageCircle, Route, UserRound, Users, Wallet } from "lucide-react";
+import { CalendarDays, Megaphone, Compass, FileCheck2, House, LayoutGrid, MessageCircle, Route, UserRound, Users, Wallet } from "lucide-react";
 
 export const STUDENT_NAV = [
   { href: "/dashboard", key: "home", icon: House },
@@ -22,3 +22,6 @@ export const STAFF_NAV = [
   { href: "/manage/documents", key: "documents", icon: FileCheck2 },
   { href: "/messages", key: "messages", icon: MessageCircle },
 ] as const;
+
+// Только в боковом меню персонала (на телефоне — через «Офферы»)
+export const STAFF_NAV_EXTRA = [{ href: "/manage/broadcast", key: "broadcast", icon: Megaphone }] as const;

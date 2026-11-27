@@ -32,7 +32,8 @@ export function fieldsSchema(defs: FieldDef[]) {
     }
     const empty = (v: unknown) => v === "" || v === undefined || v === null;
     if (d.type === "boolean") {
-      shape[d.key] = s.default(false);
+      // незаполненный переключатель = «нет»
+      shape[d.key] = z.preprocess((v) => (v === null || v === undefined || v === "" ? false : v), z.boolean());
     } else if (d.required) {
       // пустое значение → undefined → ошибка «обязательное поле»
       const req = d.type === "text" || d.type === "textarea" ? (s as z.ZodString).min(1, "required") : s;

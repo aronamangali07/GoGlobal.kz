@@ -12,6 +12,7 @@ import { Logo } from "@/components/ui/logo";
 import { Textarea } from "@/components/ui/textarea";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
+import { TelegramConnect } from "@/features/telegram/telegram-connect";
 import { completeOnboarding, saveOnboardingStep, type OnboardingStep } from "@/features/profile/actions";
 import { AvatarUploader } from "@/features/profile/avatar-uploader";
 import { ageFrom, type EnglishLevel, type Preferences } from "@/features/profile/constants";
@@ -310,10 +311,7 @@ export function OnboardingWizard({ initial, programs }: { initial: OnboardingIni
                     <p className="mt-1.5 text-sm text-white/85">{tp("telegramText")}</p>
                   </div>
                   <div className="p-5">
-                    <Button type="button" variant="secondary" className="w-full" disabled>
-                      <Send className="size-4" aria-hidden /> {tp("telegramButton")}
-                    </Button>
-                    <p className="mt-3 text-center text-xs text-fg-subtle">{tp("telegramSoon")}</p>
+                    <TelegramConnect initial={{ connected: false, username: null }} />
                   </div>
                 </div>
               )}

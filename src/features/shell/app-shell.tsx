@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Bell, LogOut } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -9,9 +9,10 @@ import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { signOut } from "@/features/auth/actions";
 import { cn } from "@/lib/utils";
-import { STAFF_NAV, STUDENT_NAV, STUDENT_NAV_EXTRA } from "./nav-items";
+import { STAFF_NAV, STAFF_NAV_EXTRA, STUDENT_NAV, STUDENT_NAV_EXTRA } from "./nav-items";
+import { NotificationBell } from "@/features/notifications/bell";
 
-type ShellUser = { name: string; email: string; avatarUrl: string | null; role: string };
+type ShellUser = { id: string; name: string; email: string; avatarUrl: string | null; role: string; unread: number };
 
 function Avatar({ user, className }: { user: ShellUser; className?: string }) {
   const initials = user.name
@@ -42,7 +43,7 @@ export function AppShell({ user, children }: { user: ShellUser; children: React.
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
   const nav = user.role === "student" ? STUDENT_NAV : STAFF_NAV;
   // На десктопе у студента в боковом меню ещё календарь, документы и оплаты
-  const sideNav = user.role === "student" ? [...STUDENT_NAV.slice(0, 3), ...STUDENT_NAV_EXTRA, ...STUDENT_NAV.slice(3)] : STAFF_NAV;
+  const sideNav = user.role === "student" ? [...STUDENT_NAV.slice(0, 3), ...STUDENT_NAV_EXTRA, ...STUDENT_NAV.slice(3)] : [...STAFF_NAV, ...STAFF_NAV_EXTRA];
 
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[260px_1fr]">
@@ -83,6 +84,9 @@ export function AppShell({ user, children }: { user: ShellUser; children: React.
             <p className="truncate text-sm font-semibold">{user.name}</p>
             <p className="truncate text-xs text-fg-muted">{user.email}</p>
           </div>
+          <Link href="/settings" className="grid size-9 place-items-center rounded-full text-fg-subtle hover:bg-surface-2 hover:text-fg" aria-label={t("settings")}>
+            <Settings className="size-4" />
+          </Link>
           <form action={signOut}>
             <button className="grid size-9 place-items-center rounded-full text-fg-subtle hover:bg-surface-2 hover:text-fg" aria-label={tc("signOut")}>
               <LogOut className="size-4" />
@@ -99,13 +103,7 @@ export function AppShell({ user, children }: { user: ShellUser; children: React.
           </Link>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <button
-              type="button"
-              aria-label={t("notifications")}
-              className="relative grid size-10 place-items-center rounded-full border border-border bg-surface text-fg-muted hover:text-fg"
-            >
-              <Bell className="size-[18px]" />
-            </button>
+            <NotificationBell userId={user.id} initialUnread={user.unread} />
             {user.role === "student" ? (
               <Link href="/profile" className="lg:hidden" aria-label={t("profile")}>
                 <Avatar user={user} className="size-10 text-sm" />

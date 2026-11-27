@@ -72,6 +72,48 @@ export type Database = {
           },
         ]
       }
+      announcements: {
+        Row: {
+          body: string
+          created_at: string
+          created_by: string | null
+          id: string
+          program_id: string | null
+          title: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          program_id?: string | null
+          title: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          program_id?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "announcements_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "announcements_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_settings: {
         Row: {
           key: string
@@ -524,6 +566,107 @@ export type Database = {
           },
         ]
       }
+      notification_deliveries: {
+        Row: {
+          attempts: number
+          channel: string
+          created_at: string
+          dedupe_key: string
+          error: string | null
+          id: string
+          notification_id: string | null
+          payload: Json
+          sent_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          channel: string
+          created_at?: string
+          dedupe_key: string
+          error?: string | null
+          id?: string
+          notification_id?: string | null
+          payload?: Json
+          sent_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          channel?: string
+          created_at?: string
+          dedupe_key?: string
+          error?: string | null
+          id?: string
+          notification_id?: string | null
+          payload?: Json
+          sent_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_deliveries_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "notifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_deliveries_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          body: string
+          created_at: string
+          data: Json
+          id: string
+          link: string
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          data?: Json
+          id?: string
+          link?: string
+          read_at?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          data?: Json
+          id?: string
+          link?: string
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       offers: {
         Row: {
           allocation_mode: Database["public"]["Enums"]["allocation_mode"]
@@ -695,10 +838,12 @@ export type Database = {
           full_name: string | null
           id: string
           locale: string
+          notification_prefs: Json
           onboarded_at: string | null
           preferences: Json
           role: Database["public"]["Enums"]["user_role"]
           telegram_chat_id: number | null
+          telegram_username: string | null
           university: string | null
           updated_at: string
         }
@@ -712,10 +857,12 @@ export type Database = {
           full_name?: string | null
           id: string
           locale?: string
+          notification_prefs?: Json
           onboarded_at?: string | null
           preferences?: Json
           role?: Database["public"]["Enums"]["user_role"]
           telegram_chat_id?: number | null
+          telegram_username?: string | null
           university?: string | null
           updated_at?: string
         }
@@ -729,10 +876,12 @@ export type Database = {
           full_name?: string | null
           id?: string
           locale?: string
+          notification_prefs?: Json
           onboarded_at?: string | null
           preferences?: Json
           role?: Database["public"]["Enums"]["user_role"]
           telegram_chat_id?: number | null
+          telegram_username?: string | null
           university?: string | null
           updated_at?: string
         }
@@ -865,6 +1014,38 @@ export type Database = {
             columns: ["enrollment_id"]
             isOneToOne: false
             referencedRelation: "enrollments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      telegram_link_tokens: {
+        Row: {
+          created_at: string
+          expires_at: string
+          token_hash: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          token_hash: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          token_hash?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "telegram_link_tokens_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

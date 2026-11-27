@@ -1,7 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { Check, Send } from "lucide-react";
+import { Check } from "lucide-react";
+import { TelegramConnect } from "@/features/telegram/telegram-connect";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
@@ -28,6 +29,7 @@ export type ProfileFormInitial = {
   program_ids: string[];
   preferences: Preferences;
   telegram_connected: boolean;
+  telegram_username?: string | null;
 };
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -132,12 +134,7 @@ export function ProfileForm({ initial, programs }: { initial: ProfileFormInitial
       </Section>
 
       <Section title={t("telegramTitle")}>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-fg-muted">{t("telegramSoon")}</p>
-          <Button type="button" variant="secondary" disabled className="shrink-0">
-            <Send className="size-4" aria-hidden /> {t("telegramButton")}
-          </Button>
-        </div>
+        <TelegramConnect initial={{ connected: initial.telegram_connected, username: initial.telegram_username ?? null }} />
       </Section>
 
       <div className="sticky bottom-20 z-20 lg:bottom-6">

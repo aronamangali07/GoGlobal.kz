@@ -7,6 +7,7 @@ import type { FieldDef } from "@/features/offers/types";
 import { requireSession } from "@/lib/data/session";
 import type { Json } from "@/lib/supabase/database.types";
 import { fieldsSchema, offerCommonSchema } from "./offer-schema";
+import { onOfferPublished } from "@/lib/notify/events";
 
 export type SaveResult =
   | { ok: true; id: string }
@@ -92,6 +93,9 @@ export async function saveOffer(input: unknown, intent: "draft" | "publish" | "s
     ? await supabase.from("offers").update(row).eq("id", v.id).select("id").single()
     : await supabase.from("offers").insert(row).select("id").single();
   if (error || !data) return { ok: false, error: "generic" };
+
+  // Первая публикация — уведомляем студентов программы (email + Telegram + колокольчик)
+  if (row.status === "open" && existing?.status !== "open" && !existing?.published_at) await onOfferPublished(data.id);
 
   revalidatePath("/manage/offers");
   revalidatePath("/offers");

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireSession } from "@/lib/data/session";
 import { runAllocationDraft } from "./run";
+import { onApplicationResults, onWindowClosed } from "@/lib/notify/events";
 
 type Result = { ok: true } | { ok: false; error: string };
 
@@ -35,6 +36,7 @@ export async function closeAndAllocate(offerId: string): Promise<Result> {
   } catch (e) {
     return { ok: false, error: errCode(e) };
   }
+  await onWindowClosed(id);
   refresh(id);
   return { ok: true };
 }
@@ -59,6 +61,7 @@ export async function confirmAllocation(offerId: string, runId: string, selected
     p_note: z.string().max(500).parse(note),
   });
   if (error) return { ok: false, error: errCode(error) };
+  await onApplicationResults(uuid.parse(offerId));
   refresh(uuid.parse(offerId));
   return { ok: true };
 }
@@ -70,6 +73,7 @@ export async function decideApplication(offerId: string, applicationId: string, 
     p_decision: z.enum(["approve", "reject", "promote"]).parse(decision),
   });
   if (error) return { ok: false, error: errCode(error) };
+  await onApplicationResults(uuid.parse(offerId), applicationId);
   refresh(uuid.parse(offerId));
   return { ok: true };
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { Archive, ArchiveRestore, Clock, Eye, Pencil, Plus, Users } from "lucide-react";
+import { Archive, ArchiveRestore, Clock, Eye, Megaphone, Pencil, Plus, Users } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
@@ -48,11 +48,16 @@ export function ManagedOffers({
           <h1 className="font-display text-[26px] font-semibold sm:text-3xl">{t("offersTitle")}</h1>
           <p className="mt-1.5 text-sm text-fg-muted">{t("offersSubtitle")}</p>
         </div>
-        <Link href="/manage/offers/new">
-          <Button size="lg" className="w-full sm:w-auto">
-            <Plus className="size-5" aria-hidden /> {t("newOffer")}
-          </Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/manage/broadcast" className="lg:hidden">
+            <Button size="lg" variant="secondary" aria-label="Рассылка"><Megaphone className="size-5" aria-hidden /></Button>
+          </Link>
+          <Link href="/manage/offers/new" className="flex-1">
+            <Button size="lg" className="w-full sm:w-auto">
+              <Plus className="size-5" aria-hidden /> {t("newOffer")}
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <div role="tablist" className="-mx-4 mt-6 flex gap-1 overflow-x-auto border-b border-border px-4 [scrollbar-width:none] sm:mx-0 sm:px-0">

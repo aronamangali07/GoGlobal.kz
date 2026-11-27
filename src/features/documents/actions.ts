@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireSession } from "@/lib/data/session";
+import { onDocumentReviewed, onDocumentUploaded } from "@/lib/notify/events";
 
 const input = z.object({
   documentTypeId: z.string().uuid(),
@@ -25,10 +26,11 @@ export async function registerDocument(raw: unknown) {
   if (existing?.status === "accepted") return { ok: false, error: "document_locked" };
 
   const row = { file_path: v.path, file_name: v.name, mime: v.mime, size_bytes: v.size, status: "pending" as const };
-  const { error } = existing
-    ? await supabase.from("documents").update(row).eq("id", existing.id)
-    : await supabase.from("documents").insert({ ...row, user_id: user.id, document_type_id: v.documentTypeId, program_id: type.program_id });
-  if (error) return { ok: false, error: "generic" };
+  const { data: saved, error } = existing
+    ? await supabase.from("documents").update(row).eq("id", existing.id).select("id").single()
+    : await supabase.from("documents").insert({ ...row, user_id: user.id, document_type_id: v.documentTypeId, program_id: type.program_id }).select("id").single();
+  if (error || !saved) return { ok: false, error: "generic" };
+  await onDocumentUploaded(saved.id);
   if (existing && existing.file_path !== v.path) await supabase.storage.from("documents").remove([existing.file_path]);
   revalidatePath("/documents");
   return { ok: true };
@@ -51,6 +53,7 @@ export async function reviewDocument(documentId: string, decision: "accepted" | 
     .from("documents")
     .update({ status: z.enum(["accepted", "rework"]).parse(decision), reviewer_comment: z.string().max(500).parse(comment) })
     .eq("id", z.string().uuid().parse(documentId));
+  if (!error) await onDocumentReviewed(documentId);
   revalidatePath("/manage/documents");
   revalidatePath("/manage/students", "layout");
   return { ok: !error };

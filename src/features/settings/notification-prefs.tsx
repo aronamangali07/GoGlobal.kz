@@ -1,0 +1,56 @@
+"use client";
+
+import { Mail, Send } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useState, useTransition } from "react";
+import { toast } from "sonner";
+import type { Category, Channel, Prefs } from "@/lib/notify/types";
+import { cn } from "@/lib/utils";
+import { saveNotificationPrefs } from "./actions";
+
+function Switch({ on, disabled, onChange, label }: { on: boolean; disabled?: boolean; onChange: () => void; label: string }) {
+  return (
+    <button type="button" role="switch" aria-checked={on} aria-label={label} disabled={disabled} onClick={onChange}
+      className={cn("relative h-7 w-12 shrink-0 rounded-full transition-colors disabled:opacity-40", on ? "bg-primary" : "bg-surface-3")}>
+      <span className={cn("absolute left-0 top-1 size-5 rounded-full bg-white shadow transition-transform", on ? "translate-x-6" : "translate-x-1")} />
+    </button>
+  );
+}
+
+/** Матрица «категория × канал». Колокольчик на сайте всегда включён. */
+export function NotificationPrefs({ initial, categories, telegramLinked }: { initial: Prefs; categories: Category[]; telegramLinked: boolean }) {
+  const t = useTranslations("settings");
+  const [prefs, setPrefs] = useState<Prefs>(initial);
+  const [, start] = useTransition();
+  const isOn = (c: Category, ch: Channel) => prefs[c]?.[ch] !== false;
+
+  const toggle = (c: Category, ch: Channel) => {
+    const next: Prefs = { ...prefs, [c]: { ...prefs[c], [ch]: !isOn(c, ch) } };
+    setPrefs(next);
+    start(async () => {
+      const res = await saveNotificationPrefs(next);
+      if (res.ok) toast.success(t("saved"), { duration: 1200 });
+    });
+  };
+
+  return (
+    <div>
+      <div className="grid grid-cols-[1fr_auto_auto] items-center gap-x-4 gap-y-1 text-xs font-semibold uppercase tracking-wider text-fg-subtle">
+        <span />
+        <span className="flex w-12 justify-center" title={t("channels.email")}><Mail className="size-4" aria-label={t("channels.email")} /></span>
+        <span className="flex w-12 justify-center" title={t("channels.telegram")}><Send className="size-4" aria-label={t("channels.telegram")} /></span>
+      </div>
+      <ul className="mt-2 divide-y divide-border">
+        {categories.map((c) => (
+          <li key={c} className="grid grid-cols-[1fr_auto_auto] items-center gap-x-4 py-3">
+            <span className="text-sm font-medium">{t(`categories.${c}`)}</span>
+            <Switch on={isOn(c, "email")} onChange={() => toggle(c, "email")} label={`${t(`categories.${c}`)}: ${t("channels.email")}`} />
+            <Switch on={telegramLinked && isOn(c, "telegram")} disabled={!telegramLinked} onChange={() => toggle(c, "telegram")}
+              label={`${t(`categories.${c}`)}: ${t("channels.telegram")}`} />
+          </li>
+        ))}
+      </ul>
+      {!telegramLinked && <p className="mt-2 text-xs text-fg-subtle">{t("telegramNotLinked")}</p>}
+    </div>
+  );
+}
