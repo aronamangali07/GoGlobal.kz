@@ -23,7 +23,7 @@ export default async function DashboardPage() {
       </header>
       <Card className="mt-10">
         <h1 className="font-display text-2xl font-semibold">{t("dashboard.greeting")}</h1>
-        <p className="mt-2 text-fg-muted">{t("dashboard.signedInAs", { email: data.user.email ?? "" })}</p>
+        <p className="mt-2 break-all text-fg-muted">{t("dashboard.signedInAs", { email: data.user.email ?? "" })}</p>
         <p className="mt-4 text-sm text-fg-subtle">{t("dashboard.nextStage")}</p>
         <form action={signOut} className="mt-6">
           <button className="text-sm font-semibold text-primary hover:underline">{t("common.signOut")}</button>
