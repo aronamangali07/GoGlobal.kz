@@ -53,7 +53,7 @@ function ShuffleOverlay() {
           className="grid size-20 place-items-center rounded-3xl bg-gradient-to-br from-primary to-route text-white shadow-[var(--shadow-lift)]">
           <Dices className="size-10" aria-hidden />
         </motion.span>
-        <p className="font-display text-xl font-semibold">{t("run")}…</p>
+        <p className="font-display text-xl font-semibold">{t("shuffling")}</p>
         <p className="font-mono text-sm text-fg-muted">{hex}</p>
       </div>
     </motion.div>

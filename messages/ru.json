@@ -547,6 +547,7 @@
     },
     "yes": "да",
     "no": "нет",
-    "applicationsBtn": "Заявки"
+    "applicationsBtn": "Заявки",
+    "shuffling": "Тянем жребий…"
   }
 }
