@@ -46,6 +46,10 @@ function getHandler() {
 
   bot.on("message", (ctx) => ctx.reply("Я присылаю уведомления GoGlobal. Ответить менеджеру можно в разделе «Сообщения» на сайте.", { reply_markup: site }));
 
+  // Ошибка ответа (например, пользователь заблокировал бота) не должна возвращать 500 —
+  // иначе Telegram будет повторять апдейт
+  bot.catch((err) => console.error("telegram bot error:", err.message));
+
   handler = webhookCallback(bot, "std/http", { secretToken: process.env.TELEGRAM_WEBHOOK_SECRET });
   return handler;
 }

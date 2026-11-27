@@ -51,6 +51,22 @@ src/
 supabase/migrations SQL-миграции
 ```
 
+## Уведомления (этап 7)
+
+Каждое событие — в колокольчик на сайте, на почту (Resend) и в Telegram (бот на webhook), по настройкам пользователя.
+Очередь доставки `notification_deliveries` с уникальным `dedupe_key` — одно и то же не уйдёт дважды.
+
+| Переменная | Где взять |
+|---|---|
+| `RESEND_API_KEY` | resend.com → API Keys |
+| `EMAIL_OVERRIDE_TO` | Демо без своего домена: все письма уходят на почту владельца Resend (в письме указано, кому оно) |
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME` | @BotFather → /newbot |
+| `TELEGRAM_WEBHOOK_SECRET` | любая случайная строка; та же передаётся в `setWebhook` |
+| `CRON_SECRET` | случайная строка; в Supabase Vault под именем `cron_secret` |
+
+Webhook бота: `https://api.telegram.org/bot<TOKEN>/setWebhook?url=<SITE>/api/telegram/webhook&secret_token=<TELEGRAM_WEBHOOK_SECRET>`.
+Крон: `supabase/migrations/0009_cron_schedule.sql` (pg_cron каждые 15 минут → `/api/cron/tick`): закрытие окон, черновики распределения, напоминания за 24 ч и 1 ч, сроки оплат, повтор неудачных доставок.
+
 ## Безопасность
 
 - Все ключи только в `.env.local` (в git не попадает). Шаблон — `.env.example`.
