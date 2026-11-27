@@ -772,7 +772,7 @@
       "staff": "Для менеджера: заявки, документы, закрытие окон"
     },
     "saved": "Сохранено",
-    "telegramNotLinked": "Подключите Telegram, чтобы включить"
+    "telegramNotLinked": "Колонка справа — Telegram. Чтобы её включить, нажмите «Подключить Telegram» выше."
   },
   "telegram": {
     "title": "Telegram",
