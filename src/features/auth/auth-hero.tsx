@@ -29,7 +29,7 @@ export function AuthHero() {
       />
       <Starfield className="-z-10" />
 
-      <header className="flex items-center justify-between px-5 pt-5 sm:px-8 sm:pt-7">
+      <header className="flex items-center justify-between px-5 pt-[max(1.25rem,env(safe-area-inset-top))] sm:px-8 sm:pt-7">
         <Logo />
         <ThemeToggle className="border-white/10 bg-white/5 lg:hidden" />
       </header>

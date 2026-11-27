@@ -4,6 +4,8 @@ import { getTranslations } from "next-intl/server";
 import { Card } from "@/components/ui/card";
 import { NotificationPrefs } from "@/features/settings/notification-prefs";
 import { TelegramConnect } from "@/features/telegram/telegram-connect";
+import { InstallCard } from "@/features/pwa/pwa";
+import { Smartphone } from "lucide-react";
 import { requireOnboardedSession } from "@/lib/data/session";
 import { CATEGORIES, type Prefs } from "@/lib/notify/types";
 
@@ -26,6 +28,10 @@ export default async function SettingsPage() {
       <Card>
         <h2 className="mb-3 flex items-center gap-2 font-display text-lg font-semibold"><Send className="size-5 text-[#229ED9]" aria-hidden /> {tt("title")}</h2>
         <TelegramConnect initial={{ connected: !!profile.telegram_chat_id, username: profile.telegram_username }} />
+      </Card>
+      <Card>
+        <h2 className="mb-2 flex items-center gap-2 font-display text-lg font-semibold"><Smartphone className="size-5 text-route" aria-hidden /> {(await getTranslations("pwa"))("settingsTitle")}</h2>
+        <InstallCard />
       </Card>
       <Card>
         <h2 className="flex items-center gap-2 font-display text-lg font-semibold"><Bell className="size-5 text-primary" aria-hidden /> {t("notifTitle")}</h2>

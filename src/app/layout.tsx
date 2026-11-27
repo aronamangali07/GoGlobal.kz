@@ -10,7 +10,14 @@ const unbounded = Unbounded({ variable: "--font-unbounded", subsets: ["latin", "
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("meta");
-  return { title: t("title"), description: t("description") };
+  return {
+    title: t("title"),
+    description: t("description"),
+    applicationName: "GoGlobal",
+    // iPhone: запуск с главного экрана без интерфейса Safari
+    appleWebApp: { capable: true, title: "GoGlobal", statusBarStyle: "black-translucent" },
+    formatDetection: { telephone: false },
+  };
 }
 
 export const viewport: Viewport = {

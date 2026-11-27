@@ -11,6 +11,7 @@ import { signOut } from "@/features/auth/actions";
 import { cn } from "@/lib/utils";
 import { ADMIN_NAV, STAFF_NAV, STAFF_NAV_EXTRA, STUDENT_NAV, STUDENT_NAV_EXTRA } from "./nav-items";
 import { NotificationBell } from "@/features/notifications/bell";
+import { InstallBanner } from "@/features/pwa/pwa";
 
 type ShellUser = { id: string; name: string; email: string; avatarUrl: string | null; role: string; unread: number };
 
@@ -99,7 +100,7 @@ export function AppShell({ user, children }: { user: ShellUser; children: React.
 
       <div className="flex min-w-0 flex-col overflow-x-clip">
         {/* Верхняя панель */}
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-border bg-bg/80 px-4 backdrop-blur-md sm:px-6 lg:justify-end">
+        <header className="sticky top-0 z-30 flex h-[calc(4rem+env(safe-area-inset-top))] items-center pt-[env(safe-area-inset-top)] justify-between gap-3 border-b border-border bg-bg/80 px-4 backdrop-blur-md sm:px-6 lg:justify-end">
           <Link href="/dashboard" className="lg:hidden">
             <Logo />
           </Link>
@@ -122,6 +123,8 @@ export function AppShell({ user, children }: { user: ShellUser; children: React.
 
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 pb-28 pt-6 sm:px-6 lg:pb-12">{children}</main>
       </div>
+
+      <InstallBanner />
 
       {/* Телефон: нижняя навигация */}
       <nav
