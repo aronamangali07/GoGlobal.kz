@@ -28,7 +28,8 @@ npm run dev                  # http://localhost:3000
    - Project URL → `NEXT_PUBLIC_SUPABASE_URL`
    - Publishable key → `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
    - Secret key → `SUPABASE_SECRET_KEY` (только на сервере, никому не показывать)
-3. **SQL Editor → New query**: вставьте содержимое `supabase/migrations/0001_profiles.sql` → **Run**.
+3. **SQL Editor → New query**: по очереди выполните все файлы из `supabase/migrations/` (0001, 0002, …) → **Run**.
+   Или задайте `SUPABASE_ACCESS_TOKEN` и `SUPABASE_PROJECT_REF` в `.env.local` и запустите `npm run db:run -- supabase/migrations/*.sql`.
 4. **Authentication → URL Configuration**:
    - Site URL: `http://localhost:3000` (после деплоя — адрес на Vercel)
    - Redirect URLs: добавьте `http://localhost:3000/auth/callback`
@@ -55,6 +56,27 @@ supabase/migrations SQL-миграции
 - Все ключи только в `.env.local` (в git не попадает). Шаблон — `.env.example`.
 - Доступ к данным — через Row Level Security в Postgres.
 
-## Тестовые аккаунты
+## Демо
 
-Появятся на этапе 9 (seed).
+**Сайт:** https://goglobal-kz.vercel.app
+
+| Роль | Email | Пароль |
+|---|---|---|
+| Студент | student@demo.goglobal.kz | GoGlobal2026! |
+| Менеджер (Work and Travel, Camp Counselor) | manager@demo.goglobal.kz | GoGlobal2026! |
+| Админ | admin@demo.goglobal.kz | GoGlobal2026! |
+
+Перед показом обновите тестовые данные — окна офферов выставятся относительно текущего времени:
+
+```bash
+npm run seed
+```
+
+## Скрипты
+
+| Команда | Что делает |
+|---|---|
+| `npm run dev` | локальный сервер |
+| `npm run seed` | демо-аккаунты и 10 офферов (A2 — реальный пример, остальные помечены как тестовые) |
+| `npm run db:run -- <file.sql>` | выполнить SQL-миграцию через Supabase Management API |
+| `npm run db:types` | перегенерировать TypeScript-типы базы |

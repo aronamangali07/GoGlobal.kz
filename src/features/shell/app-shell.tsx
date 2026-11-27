@@ -9,7 +9,7 @@ import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { signOut } from "@/features/auth/actions";
 import { cn } from "@/lib/utils";
-import { STUDENT_NAV } from "./nav-items";
+import { STAFF_NAV, STUDENT_NAV } from "./nav-items";
 
 type ShellUser = { name: string; email: string; avatarUrl: string | null; role: string };
 
@@ -40,6 +40,7 @@ export function AppShell({ user, children }: { user: ShellUser; children: React.
   const tc = useTranslations("common");
   const pathname = usePathname();
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  const nav = user.role === "student" ? STUDENT_NAV : STAFF_NAV;
 
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[260px_1fr]">
@@ -49,7 +50,7 @@ export function AppShell({ user, children }: { user: ShellUser; children: React.
           <Logo />
         </Link>
         <nav className="mt-8 flex flex-col gap-1">
-          {STUDENT_NAV.map(({ href, key, icon: Icon }) => {
+          {nav.map(({ href, key, icon: Icon }) => {
             const active = isActive(href);
             return (
               <Link
@@ -88,7 +89,7 @@ export function AppShell({ user, children }: { user: ShellUser; children: React.
         </div>
       </aside>
 
-      <div className="flex min-w-0 flex-col">
+      <div className="flex min-w-0 flex-col overflow-x-clip">
         {/* Верхняя панель */}
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-border bg-bg/80 px-4 backdrop-blur-md sm:px-6 lg:justify-end">
           <Link href="/dashboard" className="lg:hidden">
@@ -103,9 +104,17 @@ export function AppShell({ user, children }: { user: ShellUser; children: React.
             >
               <Bell className="size-[18px]" />
             </button>
-            <Link href="/profile" className="lg:hidden" aria-label={t("profile")}>
-              <Avatar user={user} className="size-10 text-sm" />
-            </Link>
+            {user.role === "student" ? (
+              <Link href="/profile" className="lg:hidden" aria-label={t("profile")}>
+                <Avatar user={user} className="size-10 text-sm" />
+              </Link>
+            ) : (
+              <form action={signOut} className="lg:hidden">
+                <button className="grid size-10 place-items-center rounded-full border border-border bg-surface text-fg-muted" aria-label={tc("signOut")}>
+                  <LogOut className="size-[18px]" />
+                </button>
+              </form>
+            )}
           </div>
         </header>
 
@@ -118,7 +127,7 @@ export function AppShell({ user, children }: { user: ShellUser; children: React.
         className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-bg/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-lg lg:hidden"
       >
         <ul className="mx-auto grid max-w-md grid-cols-5">
-          {STUDENT_NAV.map(({ href, key, icon: Icon }) => {
+          {nav.map(({ href, key, icon: Icon }) => {
             const active = isActive(href);
             return (
               <li key={href}>

@@ -14,6 +14,133 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
+      applications: {
+        Row: {
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          id: string
+          lottery_rank: number | null
+          match_score: number | null
+          offer_id: string
+          status: Database["public"]["Enums"]["application_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          lottery_rank?: number | null
+          match_score?: number | null
+          offer_id: string
+          status?: Database["public"]["Enums"]["application_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          lottery_rank?: number | null
+          match_score?: number | null
+          offer_id?: string
+          status?: Database["public"]["Enums"]["application_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_decided_by_fkey"
+            columns: ["decided_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          diff: Json
+          entity_id: string | null
+          entity_type: string
+          id: number
+          program_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          diff?: Json
+          entity_id?: string | null
+          entity_type: string
+          id?: never
+          program_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          diff?: Json
+          entity_id?: string | null
+          entity_type?: string
+          id?: never
+          program_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_log_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_log_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       enrollments: {
         Row: {
           created_at: string
@@ -52,6 +179,138 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      favorites: {
+        Row: {
+          created_at: string
+          offer_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          offer_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          offer_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      offers: {
+        Row: {
+          allocation_mode: Database["public"]["Enums"]["allocation_mode"]
+          archived_at: string | null
+          city: string
+          code: string | null
+          country: string
+          created_at: string
+          created_by: string | null
+          fields: Json
+          id: string
+          interview_at: string | null
+          interview_note: string
+          is_test: boolean
+          max_age: number | null
+          min_age: number | null
+          min_english: Database["public"]["Enums"]["english_level"] | null
+          program_id: string
+          published_at: string | null
+          seats_total: number
+          status: Database["public"]["Enums"]["offer_status"]
+          subtitle: string
+          title: string
+          updated_at: string
+          window_closes_at: string | null
+          window_hours: number
+          window_opens_at: string | null
+        }
+        Insert: {
+          allocation_mode?: Database["public"]["Enums"]["allocation_mode"]
+          archived_at?: string | null
+          city?: string
+          code?: string | null
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          fields?: Json
+          id?: string
+          interview_at?: string | null
+          interview_note?: string
+          is_test?: boolean
+          max_age?: number | null
+          min_age?: number | null
+          min_english?: Database["public"]["Enums"]["english_level"] | null
+          program_id: string
+          published_at?: string | null
+          seats_total: number
+          status?: Database["public"]["Enums"]["offer_status"]
+          subtitle?: string
+          title: string
+          updated_at?: string
+          window_closes_at?: string | null
+          window_hours?: number
+          window_opens_at?: string | null
+        }
+        Update: {
+          allocation_mode?: Database["public"]["Enums"]["allocation_mode"]
+          archived_at?: string | null
+          city?: string
+          code?: string | null
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          fields?: Json
+          id?: string
+          interview_at?: string | null
+          interview_note?: string
+          is_test?: boolean
+          max_age?: number | null
+          min_age?: number | null
+          min_english?: Database["public"]["Enums"]["english_level"] | null
+          program_id?: string
+          published_at?: string | null
+          seats_total?: number
+          status?: Database["public"]["Enums"]["offer_status"]
+          subtitle?: string
+          title?: string
+          updated_at?: string
+          window_closes_at?: string | null
+          window_hours?: number
+          window_opens_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offers_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "offers_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
             referencedColumns: ["id"]
           },
         ]
@@ -207,10 +466,37 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
+      log_action: {
+        Args: {
+          p_action: string
+          p_diff?: Json
+          p_entity_id: string
+          p_entity_type: string
+          p_program_id: string
+        }
+        Returns: undefined
+      }
       manages_program: { Args: { p_program_id: string }; Returns: boolean }
       manages_student: { Args: { p_user_id: string }; Returns: boolean }
+      offer_counts: {
+        Args: { p_offer_ids: string[] }
+        Returns: {
+          applicants: number
+          offer_id: string
+          taken: number
+        }[]
+      }
     }
     Enums: {
+      allocation_mode: "lottery" | "manual"
+      application_status:
+        | "pending"
+        | "ineligible"
+        | "selected"
+        | "waitlisted"
+        | "approved"
+        | "rejected"
+        | "withdrawn"
       english_level: "A1" | "A2" | "B1" | "B2" | "C1" | "C2"
       journey_stage:
         | "application"
@@ -220,6 +506,7 @@ export type Database = {
         | "embassy"
         | "visa"
         | "departure"
+      offer_status: "draft" | "open" | "closed" | "allocated" | "archived"
       user_role: "student" | "manager" | "admin"
     }
     CompositeTypes: {
@@ -348,6 +635,16 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      allocation_mode: ["lottery", "manual"],
+      application_status: [
+        "pending",
+        "ineligible",
+        "selected",
+        "waitlisted",
+        "approved",
+        "rejected",
+        "withdrawn",
+      ],
       english_level: ["A1", "A2", "B1", "B2", "C1", "C2"],
       journey_stage: [
         "application",
@@ -358,6 +655,7 @@ export const Constants = {
         "visa",
         "departure",
       ],
+      offer_status: ["draft", "open", "closed", "allocated", "archived"],
       user_role: ["student", "manager", "admin"],
     },
   },

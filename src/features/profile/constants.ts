@@ -11,9 +11,20 @@ export type Preferences = {
   note?: string;
 };
 
-export const COUNTRY_FLAGS: Record<(typeof COUNTRIES)[number], string> = {
-  us: "🇺🇸", de: "🇩🇪", uk: "🇬🇧", ae: "🇦🇪", kr: "🇰🇷", fr: "🇫🇷", es: "🇪🇸", tr: "🇹🇷", cn: "🇨🇳", any: "🌍",
+/** Все страны, где бывают офферы. Подписи — messages profile.country.<code> */
+export const ALL_COUNTRIES = ["us", "de", "uk", "ae", "kr", "fr", "es", "tr", "cn", "nl", "at", "ch", "it", "jp", "ca", "au"] as const;
+export type CountryCode = (typeof ALL_COUNTRIES)[number];
+
+export const COUNTRY_FLAGS: Record<string, string> = {
+  us: "🇺🇸", de: "🇩🇪", uk: "🇬🇧", ae: "🇦🇪", kr: "🇰🇷", fr: "🇫🇷", es: "🇪🇸", tr: "🇹🇷", cn: "🇨🇳",
+  nl: "🇳🇱", at: "🇦🇹", ch: "🇨🇭", it: "🇮🇹", jp: "🇯🇵", ca: "🇨🇦", au: "🇦🇺", any: "🌍",
 };
+
+export function englishAtLeast(level: string | null | undefined, min: string | null | undefined) {
+  if (!min) return true;
+  if (!level) return false;
+  return ENGLISH_LEVELS.indexOf(level as EnglishLevel) >= ENGLISH_LEVELS.indexOf(min as EnglishLevel);
+}
 
 export function ageFrom(birthDate: string | null | undefined, now = new Date()) {
   if (!birthDate) return null;

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { redirect } from "next/navigation";
 import type { EnglishLevel, Preferences } from "@/features/profile/constants";
 import { ProfileForm } from "@/features/profile/profile-form";
 import { getActivePrograms, getAvatarUrl, getMyProgramIds, requireOnboardedSession } from "@/lib/data/session";
@@ -12,6 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ProfilePage() {
   const t = await getTranslations("profile");
   const { profile, user } = await requireOnboardedSession();
+  if (profile.role !== "student") redirect("/dashboard");
   const [programs, programIds, avatarUrl] = await Promise.all([
     getActivePrograms(),
     getMyProgramIds(user.id),
