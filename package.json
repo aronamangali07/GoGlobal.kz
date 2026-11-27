@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "gen:globe": "node scripts/gen-globe-dots.mjs"
+    "gen:globe": "node scripts/gen-globe-dots.mjs",
+    "db:run": "node --env-file=.env.local scripts/db-run.mjs",
+    "db:types": "node --env-file=.env.local scripts/db-types.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^7.0.9",

@@ -9,7 +9,14 @@
     "signOut": "Выйти",
     "loading": "Загрузка…",
     "comingSoon": "Скоро",
-    "back": "Назад"
+    "back": "Назад",
+    "save": "Сохранить",
+    "saved": "Сохранено",
+    "next": "Далее",
+    "skip": "Пропустить",
+    "finish": "Готово",
+    "edit": "Изменить",
+    "years": "{count, plural, one {# год} few {# года} many {# лет} other {# года}}"
   },
   "auth": {
     "heroEyebrow": "Агентство международных программ",
@@ -18,13 +25,34 @@
     "nowFlying": "Сейчас летим",
     "from": "Алматы",
     "routes": {
-      "galveston": { "city": "Galveston, TX", "program": "Work and Travel" },
-      "munich": { "city": "Мюнхен", "program": "Au Pair" },
-      "newyork": { "city": "Нью-Йорк", "program": "Internship" },
-      "london": { "city": "Лондон", "program": "Trainee" },
-      "dubai": { "city": "Дубай", "program": "Internship" },
-      "maine": { "city": "Мэн, США", "program": "Camp Counselor" },
-      "seoul": { "city": "Сеул", "program": "Trainee" }
+      "galveston": {
+        "city": "Galveston, TX",
+        "program": "Work and Travel"
+      },
+      "munich": {
+        "city": "Мюнхен",
+        "program": "Au Pair"
+      },
+      "newyork": {
+        "city": "Нью-Йорк",
+        "program": "Internship"
+      },
+      "london": {
+        "city": "Лондон",
+        "program": "Trainee"
+      },
+      "dubai": {
+        "city": "Дубай",
+        "program": "Internship"
+      },
+      "maine": {
+        "city": "Мэн, США",
+        "program": "Camp Counselor"
+      },
+      "seoul": {
+        "city": "Сеул",
+        "program": "Trainee"
+      }
     },
     "stats": {
       "fair": "Честный жребий",
@@ -74,12 +102,168 @@
     }
   },
   "dashboard": {
-    "greeting": "Привет!",
-    "signedInAs": "Вы вошли как {email}",
-    "nextStage": "Следующий этап — онбординг и профиль участника."
+    "greeting": "Привет, {name}!",
+    "subtitle": "Вот что происходит с вашими программами",
+    "myPrograms": "Мои программы",
+    "stage": "Этап",
+    "stages": {
+      "application": "Заявка",
+      "interview": "Интервью",
+      "offer": "Оффер",
+      "documents": "Документы",
+      "embassy": "Посольство",
+      "visa": "Виза",
+      "departure": "Вылет"
+    },
+    "nextTitle": "Что дальше",
+    "nextOffers": "Новые офферы появятся в разделе «Офферы» — мы пришлём уведомление",
+    "completeProfile": "Дополнить профиль",
+    "staffNote": "Кабинет менеджера и админа появится на этапах 4–8."
   },
   "design": {
     "title": "Дизайн-система",
     "subtitle": "Цвета, типографика и компоненты GoGlobal"
+  },
+  "nav": {
+    "home": "Главная",
+    "offers": "Офферы",
+    "journey": "Мой путь",
+    "calendar": "Календарь",
+    "documents": "Документы",
+    "messages": "Сообщения",
+    "profile": "Профиль",
+    "notifications": "Уведомления",
+    "menu": "Меню"
+  },
+  "soon": {
+    "title": "Скоро здесь",
+    "text": "Этот раздел появится на одном из следующих этапов: {stage}.",
+    "back": "На главную"
+  },
+  "profile": {
+    "title": "Профиль",
+    "subtitle": "Эти данные видит только менеджер вашей программы",
+    "sections": {
+      "personal": "Личные данные",
+      "english": "Английский",
+      "programs": "Программы",
+      "preferences": "Пожелания",
+      "avatar": "Фото"
+    },
+    "fullName": "ФИО",
+    "fullNamePlaceholder": "Айгерим Нурланова",
+    "fullNameHint": "Как в паспорте — латиницей или кириллицей",
+    "birthDate": "Дата рождения",
+    "ageIs": "Вам {age}",
+    "university": "Вуз",
+    "universityPlaceholder": "КазНУ им. аль-Фараби",
+    "english": {
+      "A1": {
+        "title": "Начальный",
+        "text": "Знаю базовые фразы"
+      },
+      "A2": {
+        "title": "Элементарный",
+        "text": "Простые разговоры на бытовые темы"
+      },
+      "B1": {
+        "title": "Средний",
+        "text": "Объяснюсь в путешествии и на работе"
+      },
+      "B2": {
+        "title": "Выше среднего",
+        "text": "Свободно общаюсь с клиентами"
+      },
+      "C1": {
+        "title": "Продвинутый",
+        "text": "Говорю бегло, понимаю сложную речь"
+      },
+      "C2": {
+        "title": "Свободный",
+        "text": "Как на родном"
+      }
+    },
+    "englishHint": "Многие офферы требуют уровень B1 и выше. Честно оцените себя — на интервью уровень проверят.",
+    "programsHint": "Выберите одну или несколько — будем присылать офферы только по ним",
+    "countries": "Страны мечты",
+    "workTypes": "Какая работа нравится",
+    "note": "Комментарий для менеджера",
+    "notePlaceholder": "Например: хочу к морю, работал официантом, есть права категории B",
+    "country": {
+      "us": "США",
+      "de": "Германия",
+      "uk": "Великобритания",
+      "ae": "ОАЭ",
+      "kr": "Корея",
+      "fr": "Франция",
+      "es": "Испания",
+      "tr": "Турция",
+      "cn": "Китай",
+      "any": "Не важно"
+    },
+    "work": {
+      "restaurant": "Ресторан / кафе",
+      "hotel": "Отель",
+      "park": "Парк развлечений",
+      "retail": "Магазин",
+      "kids": "Работа с детьми",
+      "office": "Офис / IT",
+      "sport": "Спорт",
+      "kitchen": "Кухня",
+      "camp": "Лагерь"
+    },
+    "avatarTitle": "Фото профиля",
+    "avatarHint": "Чёткое фото лица — оно понадобится менеджеру и работодателю",
+    "avatarUpload": "Загрузить фото",
+    "avatarChange": "Заменить",
+    "avatarRemove": "Удалить",
+    "avatarUploading": "Загружаем…",
+    "telegramTitle": "Подключите Telegram",
+    "telegramText": "Новые офферы, интервью и дедлайны придут в Telegram и на почту — даже ночью вы ничего не пропустите.",
+    "telegramButton": "Подключить Telegram",
+    "telegramSoon": "Подключение бота появится на этапе уведомлений — его можно будет включить в профиле.",
+    "completeness": "Профиль заполнен на {percent}%",
+    "errors": {
+      "nameShort": "Введите имя и фамилию полностью",
+      "nameTwoWords": "Нужны имя и фамилия",
+      "birthInvalid": "Укажите дату рождения",
+      "birthRange": "Участвовать можно с 16 до 45 лет",
+      "universityShort": "Укажите вуз",
+      "englishRequired": "Выберите уровень",
+      "programsRequired": "Выберите хотя бы одну программу",
+      "noteLong": "Слишком длинный комментарий",
+      "programLocked": "Из программы, где уже идёт процесс, выйти нельзя — напишите менеджеру",
+      "avatarTooBig": "Файл больше 10 МБ",
+      "avatarType": "Нужна картинка: JPG, PNG или WebP",
+      "generic": "Не удалось сохранить. Попробуйте ещё раз"
+    }
+  },
+  "onboarding": {
+    "stepOf": "Шаг {current} из {total}",
+    "steps": {
+      "personal": "Знакомство",
+      "english": "Английский",
+      "avatar": "Фото",
+      "programs": "Программы",
+      "preferences": "Пожелания",
+      "telegram": "Уведомления"
+    },
+    "personalTitle": "Давайте знакомиться",
+    "personalText": "Эти данные нужны для заявок на офферы",
+    "englishTitle": "Ваш уровень английского",
+    "englishText": "От него зависят доступные офферы",
+    "avatarTitle": "Добавьте фото",
+    "avatarText": "Профиль с фото выглядит надёжнее",
+    "programsTitle": "Куда хотите поехать?",
+    "programsText": "Выберите программы — лента офферов подстроится под вас",
+    "preferencesTitle": "Ваши пожелания",
+    "preferencesText": "Учитываем их при распределении мест — чем точнее, тем лучше",
+    "telegramTitle": "Последний шаг",
+    "telegramText": "Как вам сообщать о новых офферах?",
+    "doneTitle": "Вы на борту!",
+    "doneText": "Профиль готов. Теперь новые офферы по вашим программам будут приходить первыми — честно и без гонки.",
+    "doneButton": "В личный кабинет",
+    "from": "Алматы",
+    "to": "Ваша программа"
   }
 }
