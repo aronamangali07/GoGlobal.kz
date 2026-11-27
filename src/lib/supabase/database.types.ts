@@ -215,6 +215,121 @@ export type Database = {
           },
         ]
       }
+      document_types: {
+        Row: {
+          description: string
+          id: string
+          name: string
+          program_id: string
+          required: boolean
+          sort: number
+        }
+        Insert: {
+          description?: string
+          id?: string
+          name: string
+          program_id: string
+          required?: boolean
+          sort?: number
+        }
+        Update: {
+          description?: string
+          id?: string
+          name?: string
+          program_id?: string
+          required?: boolean
+          sort?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_types_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documents: {
+        Row: {
+          created_at: string
+          document_type_id: string
+          file_name: string
+          file_path: string
+          id: string
+          mime: string
+          program_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          reviewer_comment: string
+          size_bytes: number
+          status: Database["public"]["Enums"]["doc_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          document_type_id: string
+          file_name: string
+          file_path: string
+          id?: string
+          mime?: string
+          program_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_comment?: string
+          size_bytes?: number
+          status?: Database["public"]["Enums"]["doc_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          document_type_id?: string
+          file_name?: string
+          file_path?: string
+          id?: string
+          mime?: string
+          program_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_comment?: string
+          size_bytes?: number
+          status?: Database["public"]["Enums"]["doc_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_document_type_id_fkey"
+            columns: ["document_type_id"]
+            isOneToOne: false
+            referencedRelation: "document_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       enrollments: {
         Row: {
           created_at: string
@@ -257,6 +372,83 @@ export type Database = {
           },
         ]
       }
+      events: {
+        Row: {
+          address: string
+          created_at: string
+          created_by: string | null
+          ends_at: string | null
+          id: string
+          notes: string
+          offer_id: string | null
+          program_id: string
+          starts_at: string
+          title: string
+          type: Database["public"]["Enums"]["event_type"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          id?: string
+          notes?: string
+          offer_id?: string | null
+          program_id: string
+          starts_at: string
+          title: string
+          type: Database["public"]["Enums"]["event_type"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          id?: string
+          notes?: string
+          offer_id?: string | null
+          program_id?: string
+          starts_at?: string
+          title?: string
+          type?: Database["public"]["Enums"]["event_type"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           created_at: string
@@ -286,6 +478,48 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          read_at: string | null
+          sender_id: string
+          thread_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_id: string
+          thread_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_id?: string
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "threads"
             referencedColumns: ["id"]
           },
         ]
@@ -389,10 +623,72 @@ export type Database = {
           },
         ]
       }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          currency: string
+          due_date: string | null
+          id: string
+          paid_at: string | null
+          program_id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          due_date?: string | null
+          id?: string
+          paid_at?: string | null
+          program_id: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          due_date?: string | null
+          id?: string
+          paid_at?: string | null
+          program_id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_path: string | null
           birth_date: string | null
+          calendar_token: string
           created_at: string
           email: string
           english_level: Database["public"]["Enums"]["english_level"] | null
@@ -409,6 +705,7 @@ export type Database = {
         Insert: {
           avatar_path?: string | null
           birth_date?: string | null
+          calendar_token?: string
           created_at?: string
           email: string
           english_level?: Database["public"]["Enums"]["english_level"] | null
@@ -425,6 +722,7 @@ export type Database = {
         Update: {
           avatar_path?: string | null
           birth_date?: string | null
+          calendar_token?: string
           created_at?: string
           email?: string
           english_level?: Database["public"]["Enums"]["english_level"] | null
@@ -529,6 +827,87 @@ export type Database = {
           },
         ]
       }
+      stage_history: {
+        Row: {
+          changed_by: string | null
+          created_at: string
+          enrollment_id: string
+          from_stage: Database["public"]["Enums"]["journey_stage"] | null
+          id: number
+          to_stage: Database["public"]["Enums"]["journey_stage"]
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string
+          enrollment_id: string
+          from_stage?: Database["public"]["Enums"]["journey_stage"] | null
+          id?: never
+          to_stage: Database["public"]["Enums"]["journey_stage"]
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string
+          enrollment_id?: string
+          from_stage?: Database["public"]["Enums"]["journey_stage"] | null
+          id?: never
+          to_stage?: Database["public"]["Enums"]["journey_stage"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stage_history_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stage_history_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "enrollments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      threads: {
+        Row: {
+          created_at: string
+          id: string
+          last_message_at: string
+          program_id: string
+          student_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          program_id: string
+          student_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          program_id?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "threads_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "threads_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -587,6 +966,7 @@ export type Database = {
       }
       manages_program: { Args: { p_program_id: string }; Returns: boolean }
       manages_student: { Args: { p_user_id: string }; Returns: boolean }
+      mark_thread_read: { Args: { p_thread_id: string }; Returns: undefined }
       offer_counts: {
         Args: { p_offer_ids: string[] }
         Returns: {
@@ -595,6 +975,7 @@ export type Database = {
           taken: number
         }[]
       }
+      thread_member: { Args: { p_thread_id: string }; Returns: boolean }
       withdraw_application: {
         Args: { p_application_id: string }
         Returns: undefined
@@ -610,7 +991,9 @@ export type Database = {
         | "approved"
         | "rejected"
         | "withdrawn"
+      doc_status: "pending" | "accepted" | "rework"
       english_level: "A1" | "A2" | "B1" | "B2" | "C1" | "C2"
+      event_type: "interview" | "embassy" | "deadline" | "flight" | "other"
       journey_stage:
         | "application"
         | "interview"
@@ -758,7 +1141,9 @@ export const Constants = {
         "rejected",
         "withdrawn",
       ],
+      doc_status: ["pending", "accepted", "rework"],
       english_level: ["A1", "A2", "B1", "B2", "C1", "C2"],
+      event_type: ["interview", "embassy", "deadline", "flight", "other"],
       journey_stage: [
         "application",
         "interview",

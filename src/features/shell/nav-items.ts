@@ -1,4 +1,4 @@
-import { CalendarDays, Compass, FileCheck2, House, LayoutGrid, MessageCircle, Route, UserRound, Users } from "lucide-react";
+import { CalendarDays, Compass, FileCheck2, House, LayoutGrid, MessageCircle, Route, UserRound, Users, Wallet } from "lucide-react";
 
 export const STUDENT_NAV = [
   { href: "/dashboard", key: "home", icon: House },
@@ -9,7 +9,11 @@ export const STUDENT_NAV = [
 ] as const;
 
 // Пункты только для десктопного меню (на телефоне — внутри разделов)
-export const STUDENT_NAV_EXTRA = [{ href: "/calendar", key: "calendar", icon: CalendarDays }] as const;
+export const STUDENT_NAV_EXTRA = [
+  { href: "/calendar", key: "calendar", icon: CalendarDays },
+  { href: "/documents", key: "documents", icon: FileCheck2 },
+  { href: "/payments", key: "payments", icon: Wallet },
+] as const;
 
 export const STAFF_NAV = [
   { href: "/dashboard", key: "home", icon: House },

@@ -256,6 +256,96 @@ await applyMany("Namsan Grand Hotel", ["aigerim", "timur", "zhanel", "alikhan", 
   console.log(`✓ Namsan Grand Hotel распределён, Айгерим: #${me?.rank} ${me?.outcome}`);
 }
 
+// ---------- Этап 6: путь, события, документы, оплаты, сообщения ----------
+{
+  const all = Object.values(U);
+  // чистим прошлые данные демо-студентов
+  for (const uid of all) {
+    const { data: files } = await db.storage.from("documents").list(uid, { limit: 100 });
+    for (const f of files ?? []) {
+      const { data: inner } = await db.storage.from("documents").list(`${uid}/${f.name}`, { limit: 100 });
+      if (inner?.length) await db.storage.from("documents").remove(inner.map((x) => `${uid}/${f.name}/${x.name}`));
+    }
+  }
+  await must(db.from("events").delete().in("user_id", all), "reset events");
+  await must(db.from("documents").delete().in("user_id", all), "reset documents");
+  await must(db.from("payments").delete().in("user_id", all), "reset payments");
+  await must(db.from("threads").delete().in("student_id", all), "reset threads");
+
+  // Айгерим: в Internship (Namsan) интервью пройдено, оффер есть — собирает документы
+  await must(db.from("enrollments").update({ current_stage: "offer" }).eq("user_id", studentId).eq("program_id", P.internship), "stage offer");
+  await must(db.from("enrollments").update({ current_stage: "documents" }).eq("user_id", studentId).eq("program_id", P.internship), "stage docs");
+
+  const at = (days: number, hourAlmaty: number) => {
+    const d = new Date(now + days * 24 * H);
+    d.setUTCHours(hourAlmaty - 5, 0, 0, 0);
+    return d.toISOString();
+  };
+  await must(db.from("events").insert([
+    { user_id: studentId, program_id: P.internship, type: "interview", title: "Интервью с Namsan Grand Hotel", starts_at: at(-6, 11),
+      address: "Zoom — ссылка в письме", notes: "Пройдено ✓", created_by: adminId },
+    { user_id: studentId, program_id: P.internship, type: "deadline", title: "Загрузить пакет документов", starts_at: at(3, 23),
+      address: "", notes: "Справка с места учёбы — с печатью", created_by: adminId },
+    { user_id: studentId, program_id: P.internship, type: "embassy", title: "Собеседование в консульстве Республики Корея", starts_at: at(10, 10),
+      address: "Алматы, консульский отдел (точный адрес — в письме менеджера)", notes: "Взять паспорт, фото 3,5×4,5, распечатку Training Plan", created_by: adminId },
+    { user_id: studentId, program_id: P.internship, type: "flight", title: "Вылет Алматы → Сеул", starts_at: at(34, 9),
+      address: "Аэропорт Алматы", notes: "", created_by: adminId },
+  ]), "events");
+
+  // Документы: кладём маленькие PDF в Storage
+  const pdf = (title: string) => new TextEncoder().encode(`%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj 3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 300 120]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>endobj 4 0 obj<</Length 60>>stream\nBT /F1 14 Tf 20 60 Td (${title}) Tj ET\nendstream endobj 5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj\ntrailer<</Root 1 0 R>>\n%%EOF`);
+  const { data: types } = await db.from("document_types").select("id, name").eq("program_id", P.internship);
+  const T = Object.fromEntries(types!.map((t) => [t.name, t.id]));
+  const docs = [
+    { name: "Загранпаспорт", file: "passport.pdf", status: "accepted", comment: "" },
+    { name: "Резюме (CV)", file: "CV_Nurlanova.pdf", status: "accepted", comment: "" },
+    { name: "Справка с места учёбы", file: "spravka.pdf", status: "rework", comment: "Нужна справка с печатью университета и датой не старше месяца" },
+    { name: "Мотивационное письмо", file: "motivation_letter.pdf", status: "pending", comment: "" },
+  ];
+  for (const d of docs) {
+    const path = `${studentId}/${T[d.name]}/${now}-${d.file}`;
+    await must(db.storage.from("documents").upload(path, pdf(d.file), { contentType: "application/pdf" }), `upload ${d.file}`);
+    await must(db.from("documents").insert({ user_id: studentId, document_type_id: T[d.name], program_id: P.internship, file_path: path,
+      file_name: d.file, mime: "application/pdf", size_bytes: 600, status: d.status as "pending", reviewer_comment: d.comment,
+      reviewed_by: d.status === "pending" ? null : adminId, reviewed_at: d.status === "pending" ? null : iso(now - 20 * H) }), `doc ${d.name}`);
+  }
+  // Ещё документ на проверку от другого студента — чтобы очередь менеджера W&T не была пустой
+  const { data: wtTypes } = await db.from("document_types").select("id, name").eq("program_id", P["work-and-travel"]);
+  const passportWT = wtTypes!.find((t) => t.name === "Загранпаспорт")!.id;
+  {
+    const path = `${U.madina}/${passportWT}/${now}-passport.pdf`;
+    await must(db.storage.from("documents").upload(path, pdf("passport"), { contentType: "application/pdf" }), "upload madina");
+    await must(db.from("documents").insert({ user_id: U.madina, document_type_id: passportWT, program_id: P["work-and-travel"], file_path: path,
+      file_name: "passport_Akhmetova.pdf", mime: "application/pdf", size_bytes: 600 }), "doc madina");
+  }
+
+  const dateIn = (days: number) => new Date(now + days * 24 * H).toISOString().slice(0, 10);
+  await must(db.from("payments").insert([
+    { user_id: studentId, program_id: P.internship, title: "Сбор за программу", amount: 450000, currency: "KZT", due_date: dateIn(-20), paid_at: iso(now - 22 * 24 * H), created_by: adminId },
+    { user_id: studentId, program_id: P.internship, title: "Медицинская страховка", amount: 45, currency: "USD", due_date: dateIn(5), created_by: adminId },
+    { user_id: studentId, program_id: P.internship, title: "Консульский сбор", amount: 160, currency: "USD", due_date: dateIn(9), created_by: adminId },
+    { user_id: studentId, program_id: P["work-and-travel"], title: "Регистрационный взнос", amount: 50000, currency: "KZT", due_date: dateIn(-2), created_by: managerId },
+  ]), "payments");
+
+  const thread = async (student: string, program: string, msgs: [string, string, number][]) => {
+    const th = await must(db.from("threads").insert({ student_id: student, program_id: program }).select("id").single(), "thread");
+    await must(db.from("messages").insert(msgs.map(([sender, body, hoursAgo]) => ({
+      thread_id: th.id, sender_id: sender, body, created_at: iso(now - hoursAgo * H), read_at: hoursAgo > 1 ? iso(now - (hoursAgo - 0.5) * H) : null,
+    }))), "messages");
+  };
+  await thread(studentId, P.internship, [
+    [adminId, "Айгерим, поздравляю с местом в Namsan Grand Hotel! 🎉 Интервью прошло отлично, работодатель подтвердил оффер.", 30],
+    [studentId, "Спасибо огромное! Что дальше по документам?", 29],
+    [adminId, "Загрузите, пожалуйста, справку с места учёбы заново — нужна печать университета. Остальное приняла.", 20],
+    [studentId, "Хорошо, завтра возьму в деканате 🙏", 19],
+  ]);
+  await thread(studentId, P["work-and-travel"], [
+    [studentId, "Здравствуйте! Подскажите, когда будет интервью по офферу A2?", 3],
+    [managerId, "Добрый день! Работодатель обещал на следующей неделе, точную дату пришлём в календарь.", 2],
+  ]);
+  console.log("✓ Путь, события, документы, оплаты и сообщения");
+}
+
 console.log(`✓ Аккаунты (пароль ${DEMO_PASSWORD}):
   студент   student@demo.goglobal.kz
   менеджер  manager@demo.goglobal.kz  (Work and Travel, Camp Counselor)
