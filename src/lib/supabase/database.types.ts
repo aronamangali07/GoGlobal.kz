@@ -14,6 +14,64 @@ export type Database = {
   }
   public: {
     Tables: {
+      allocation_runs: {
+        Row: {
+          confirmed_at: string | null
+          confirmed_by: string | null
+          created_at: string
+          id: string
+          offer_id: string
+          params: Json
+          result: Json
+          run_by: string | null
+          seed: string
+        }
+        Insert: {
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          id?: string
+          offer_id: string
+          params?: Json
+          result: Json
+          run_by?: string | null
+          seed: string
+        }
+        Update: {
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          id?: string
+          offer_id?: string
+          params?: Json
+          result?: Json
+          run_by?: string | null
+          seed?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "allocation_runs_confirmed_by_fkey"
+            columns: ["confirmed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "allocation_runs_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "allocation_runs_run_by_fkey"
+            columns: ["run_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_settings: {
         Row: {
           key: string
@@ -37,11 +95,14 @@ export type Database = {
           created_at: string
           decided_at: string | null
           decided_by: string | null
+          decision_note: string | null
           id: string
           lottery_rank: number | null
           match_score: number | null
           offer_id: string
+          program_id: string
           status: Database["public"]["Enums"]["application_status"]
+          ticket: string | null
           updated_at: string
           user_id: string
         }
@@ -49,11 +110,14 @@ export type Database = {
           created_at?: string
           decided_at?: string | null
           decided_by?: string | null
+          decision_note?: string | null
           id?: string
           lottery_rank?: number | null
           match_score?: number | null
           offer_id: string
+          program_id: string
           status?: Database["public"]["Enums"]["application_status"]
+          ticket?: string | null
           updated_at?: string
           user_id: string
         }
@@ -61,11 +125,14 @@ export type Database = {
           created_at?: string
           decided_at?: string | null
           decided_by?: string | null
+          decision_note?: string | null
           id?: string
           lottery_rank?: number | null
           match_score?: number | null
           offer_id?: string
+          program_id?: string
           status?: Database["public"]["Enums"]["application_status"]
+          ticket?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -82,6 +149,13 @@ export type Database = {
             columns: ["offer_id"]
             isOneToOne: false
             referencedRelation: "offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
             referencedColumns: ["id"]
           },
           {
@@ -460,9 +534,44 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      allocation_inputs: {
+        Args: { p_offer_id: string }
+        Returns: {
+          application_id: string
+          avatar_path: string
+          birth_date: string
+          created_at: string
+          english_level: string
+          enrolled: boolean
+          full_name: string
+          has_place_elsewhere: boolean
+          preferences: Json
+          status: string
+          user_id: string
+        }[]
+      }
+      allocation_public: {
+        Args: { p_offer_id: string }
+        Returns: {
+          confirmed_at: string
+          ranks: Json
+          seed: string
+        }[]
+      }
+      apply_to_offer: { Args: { p_offer_id: string }; Returns: string }
+      close_expired_offers: { Args: never; Returns: string[] }
+      close_offer_window: { Args: { p_offer_id: string }; Returns: undefined }
+      confirm_allocation: {
+        Args: { p_note?: string; p_run_id: string; p_selected: string[] }
+        Returns: undefined
+      }
       current_role: {
         Args: never
         Returns: Database["public"]["Enums"]["user_role"]
+      }
+      decide_application: {
+        Args: { p_application_id: string; p_decision: string; p_note?: string }
+        Returns: undefined
       }
       is_admin: { Args: never; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
@@ -485,6 +594,10 @@ export type Database = {
           offer_id: string
           taken: number
         }[]
+      }
+      withdraw_application: {
+        Args: { p_application_id: string }
+        Returns: undefined
       }
     }
     Enums: {

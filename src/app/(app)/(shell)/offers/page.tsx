@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { OfferFeed } from "@/features/offers/offer-feed";
 import { getStudentFeed } from "@/lib/data/offers";
+import { getMyApplications } from "@/lib/data/applications";
 import { getActivePrograms, getMyProgramIds, requireOnboardedSession } from "@/lib/data/session";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -15,10 +16,11 @@ export default async function OffersPage() {
   const { profile, user } = await requireOnboardedSession();
   if (profile.role !== "student") redirect("/manage/offers");
 
-  const [{ offers, counts, favorites }, programIds, programs] = await Promise.all([
+  const [{ offers, counts, favorites }, programIds, programs, apps] = await Promise.all([
     getStudentFeed(user.id),
     getMyProgramIds(user.id),
     getActivePrograms(),
+    getMyApplications(user.id),
   ]);
 
   return (
@@ -30,6 +32,7 @@ export default async function OffersPage() {
         counts={counts}
         favorites={favorites}
         student={{ english_level: profile.english_level, birth_date: profile.birth_date, programIds }}
+        myStatuses={Object.fromEntries(apps.map((a) => [a.offer_id, a.status]))}
         programs={programs.filter((p) => programIds.includes(p.id)).map(({ id, name, icon, color }) => ({ id, name, icon, color }))}
       />
     </div>

@@ -13,7 +13,8 @@ import { FavoriteButton } from "./favorite-button";
 import { formatDate, formatFieldValue } from "./format";
 import { SeatsBar } from "./seats-bar";
 import { windowState, type FieldValues, type OfferWithProgram } from "./types";
-import { WantButton } from "./want-button";
+import { WantButton, type MyAppState } from "./want-button";
+import { FairnessPanel } from "@/features/allocation/fairness-panel";
 
 export async function OfferDetail({
   offer,
@@ -22,6 +23,11 @@ export async function OfferDetail({
   eligibility,
   backHref = "/offers",
   staffView = false,
+  myApp = null,
+  conflict = null,
+  fairness = null,
+  userId,
+  staffActions,
 }: {
   offer: OfferWithProgram;
   taken: number;
@@ -29,6 +35,11 @@ export async function OfferDetail({
   eligibility?: { eligible: boolean; checks: EligibilityCheck[] };
   backHref?: string;
   staffView?: boolean;
+  myApp?: MyAppState;
+  conflict?: { offerId: string; label: string } | null;
+  fairness?: { seed: string; ranks: { rank: number; ticket: string; outcome: "selected" | "waitlisted" | "ineligible"; me: boolean }[] } | null;
+  userId?: string;
+  staffActions?: React.ReactNode;
 }) {
   const t = await getTranslations("offers");
   const tp = await getTranslations("profile");
@@ -121,6 +132,8 @@ export async function OfferDetail({
               </ol>
             )}
           </Card>
+
+          {fairness && <FairnessPanel seed={fairness.seed} ranks={fairness.ranks} userId={userId} />}
         </div>
 
         {/* Правая колонка: места, окно, требования, кнопка */}
@@ -182,14 +195,21 @@ export async function OfferDetail({
             )}
           </Card>
 
+          {staffActions}
           {!staffView && (
-            <div className="fixed inset-x-0 bottom-16 z-30 border-t border-border bg-bg/90 p-4 backdrop-blur-lg lg:static lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
-              <WantButton state={state} eligible={eligibility?.eligible ?? false} />
+            <div
+              className={cn(
+                myApp
+                  ? "" // статус заявки — обычный блок в колонке
+                  : "fixed inset-x-0 bottom-16 z-30 border-t border-border bg-bg/90 p-4 backdrop-blur-lg lg:static lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none",
+              )}
+            >
+              <WantButton offerId={offer.id} state={state} eligible={eligibility?.eligible ?? false} myApp={myApp} conflict={conflict} />
             </div>
           )}
         </div>
       </div>
-      {!staffView && <div className="h-20 lg:hidden" aria-hidden />}
+      {!staffView && !myApp && <div className="h-20 lg:hidden" aria-hidden />}
     </div>
   );
 }

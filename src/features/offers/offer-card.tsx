@@ -22,6 +22,7 @@ export function OfferCard({
   onFavorite,
   index = 0,
   showTest = false,
+  myStatus,
 }: {
   offer: OfferWithProgram;
   taken: number;
@@ -30,9 +31,11 @@ export function OfferCard({
   onFavorite?: (on: boolean) => void;
   index?: number;
   showTest?: boolean;
+  myStatus?: string;
 }) {
   const t = useTranslations("offers");
   const tp = useTranslations("profile");
+  const ta = useTranslations("apply");
   const state = windowState(offer);
   const isNew = isFresh(offer.published_at);
   const facts = cardFacts(offer.program.slug, offer.program.offer_schema, offer.fields as Record<string, never>, {
@@ -71,7 +74,16 @@ export function OfferCard({
               {offer.program.name}
               {offer.code && <span className="opacity-80">· {offer.code}</span>}
             </span>
-            {isNew && state === "open" && <Badge tone="accent" className="bg-white text-accent">{t("new")}</Badge>}
+            {myStatus ? (
+              <Badge
+                tone={myStatus === "selected" || myStatus === "approved" ? "success" : myStatus === "pending" ? "route" : "warning"}
+                className="bg-white"
+              >
+                {ta(`status.${myStatus}` as "status.pending")}
+              </Badge>
+            ) : (
+              isNew && state === "open" && <Badge tone="accent" className="bg-white text-accent">{t("new")}</Badge>
+            )}
           </div>
         </div>
         <FavoriteButton offerId={offer.id} active={favorite} onChange={onFavorite} className="absolute right-3 top-[76px] shadow-[var(--shadow-soft)]" />

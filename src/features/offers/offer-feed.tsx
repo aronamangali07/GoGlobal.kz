@@ -22,12 +22,14 @@ export function OfferFeed({
   favorites: initialFavorites,
   student,
   programs,
+  myStatuses = {},
 }: {
   offers: OfferWithProgram[];
   counts: Record<string, { taken: number }>;
   favorites: string[];
   student: FeedStudent;
   programs: { id: string; name: string; icon: string; color: string }[];
+  myStatuses?: Record<string, string>;
 }) {
   const t = useTranslations("offers");
   const tp = useTranslations("profile");
@@ -171,6 +173,7 @@ export function OfferFeed({
                 taken={counts[o.id]?.taken ?? 0}
                 favorite={favorites.has(o.id)}
                 eligible={eligibility[o.id]}
+                myStatus={myStatuses[o.id]}
                 onFavorite={(on) =>
                   setFavorites((prev) => {
                     const next = new Set(prev);

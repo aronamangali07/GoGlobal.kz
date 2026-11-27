@@ -35,6 +35,7 @@ export function ManagedOffers({
 }) {
   const t = useTranslations("manage");
   const to = useTranslations("offers");
+  const ta = useTranslations("allocation");
   const [tab, setTab] = useState<Tab>("active");
   const [pending, start] = useTransition();
   const byTab = (x: Tab) => offers.filter((o) => tabOf(o) === x);
@@ -107,6 +108,11 @@ export function ManagedOffers({
                 {s !== "draft" && <SeatsBar taken={c.taken} total={o.seats_total} className="mt-3" />}
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Link href={`/offers/${o.id}`}><Button size="sm" variant="secondary"><Eye className="size-4" aria-hidden /> {t("view")}</Button></Link>
+                  {s !== "draft" && (
+                    <Link href={`/manage/offers/${o.id}/applications`}>
+                      <Button size="sm" variant={s === "closed" ? "primary" : "secondary"}><Users className="size-4" aria-hidden /> {ta("applicationsBtn")} · {c.applicants}</Button>
+                    </Link>
+                  )}
                   {s !== "archived" && <Link href={`/manage/offers/${o.id}/edit`}><Button size="sm" variant="secondary"><Pencil className="size-4" aria-hidden /> {t("edit")}</Button></Link>}
                   <Button size="sm" variant="ghost" disabled={pending}
                     onClick={() => start(async () => {

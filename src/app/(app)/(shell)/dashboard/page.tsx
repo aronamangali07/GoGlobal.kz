@@ -6,6 +6,8 @@ import { ProgramIcon } from "@/components/ui/program-icon";
 import { requireOnboardedSession } from "@/lib/data/session";
 import { profileCompleteness } from "@/features/profile/completeness";
 import { JourneyMini } from "@/features/shell/journey-mini";
+import { MyApplications } from "@/features/applications/my-applications";
+import { getMyApplications } from "@/lib/data/applications";
 
 export default async function DashboardPage() {
   const t = await getTranslations("dashboard");
@@ -17,6 +19,7 @@ export default async function DashboardPage() {
     .eq("user_id", user.id)
     .order("created_at");
 
+  const apps = profile.role === "student" ? await getMyApplications(user.id) : [];
   const firstName = profile.full_name?.split(/\s+/)[0] ?? "";
   const percent = profileCompleteness(profile);
 
@@ -57,6 +60,8 @@ export default async function DashboardPage() {
           </div>
         </section>
       )}
+
+      {profile.role === "student" && <MyApplications apps={apps} />}
 
       <div className="grid gap-3 md:grid-cols-2">
         <Card className="flex items-start gap-3">
