@@ -51,3 +51,21 @@ test("разные зёрна дают разный порядок (жребий
   for (const seed of ["a", "b", "c", "d", "e"]) orders.add((await allocate(offer, cands, seed)).map((x) => x.user_id).join());
   assert.ok(orders.size > 1);
 });
+
+test("веса из настроек админа: без приоритета «нет места» решает жребий", async () => {
+  const cands = [base("a", { hasPlaceElsewhere: true }), base("b")];
+  const withPriority = await allocate({ ...offer, seats: 1 }, cands, "s");
+  assert.equal(withPriority[0].user_id, "user-b");
+  // находим зерно, при котором жребий ставит «a» первым — без приоритета он и должен выиграть
+  for (const seed of ["1", "2", "3", "4", "5", "6", "7", "8"]) {
+    const r = await allocate({ ...offer, seats: 1 }, cands, seed, { country: 0.5, work: 0.5, noPlacePriority: false });
+    const ta = r.find((x) => x.user_id === "user-a")!.ticket, tb = r.find((x) => x.user_id === "user-b")!.ticket;
+    assert.equal(r[0].user_id, ta < tb ? "user-a" : "user-b");
+  }
+});
+
+test("вес страны 0: совпадение по стране не даёт преимущества", async () => {
+  const r = await allocate({ ...offer, seats: 1 }, [base("a", { preferences: { countries: ["de"], workTypes: ["restaurant"] } }), base("b")], "x",
+    { country: 0, work: 1, noPlacePriority: true });
+  assert.equal(r[0].match, r[1].match);
+});

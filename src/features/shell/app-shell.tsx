@@ -9,7 +9,7 @@ import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { signOut } from "@/features/auth/actions";
 import { cn } from "@/lib/utils";
-import { STAFF_NAV, STAFF_NAV_EXTRA, STUDENT_NAV, STUDENT_NAV_EXTRA } from "./nav-items";
+import { ADMIN_NAV, STAFF_NAV, STAFF_NAV_EXTRA, STUDENT_NAV, STUDENT_NAV_EXTRA } from "./nav-items";
 import { NotificationBell } from "@/features/notifications/bell";
 
 type ShellUser = { id: string; name: string; email: string; avatarUrl: string | null; role: string; unread: number };
@@ -41,9 +41,11 @@ export function AppShell({ user, children }: { user: ShellUser; children: React.
   const tc = useTranslations("common");
   const pathname = usePathname();
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
-  const nav = user.role === "student" ? STUDENT_NAV : STAFF_NAV;
+  const nav = user.role === "student" ? STUDENT_NAV : user.role === "admin" ? ADMIN_NAV : STAFF_NAV;
   // На десктопе у студента в боковом меню ещё календарь, документы и оплаты
-  const sideNav = user.role === "student" ? [...STUDENT_NAV.slice(0, 3), ...STUDENT_NAV_EXTRA, ...STUDENT_NAV.slice(3)] : [...STAFF_NAV, ...STAFF_NAV_EXTRA];
+  const sideNav = user.role === "student" ? [...STUDENT_NAV.slice(0, 3), ...STUDENT_NAV_EXTRA, ...STUDENT_NAV.slice(3)] : user.role === "admin"
+        ? [...STAFF_NAV, ...STAFF_NAV_EXTRA, ADMIN_NAV[3]]
+        : [...STAFF_NAV, ...STAFF_NAV_EXTRA];
 
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[260px_1fr]">

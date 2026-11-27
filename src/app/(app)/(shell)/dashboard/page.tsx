@@ -8,6 +8,9 @@ import { profileCompleteness } from "@/features/profile/completeness";
 import { JourneyMini } from "@/features/shell/journey-mini";
 import { MyApplications } from "@/features/applications/my-applications";
 import { getMyApplications } from "@/lib/data/applications";
+import { StatsView } from "@/features/admin/stats-view";
+import { getStats } from "@/lib/data/admin";
+import { getManagedPrograms } from "@/lib/data/offers";
 
 export default async function DashboardPage() {
   const t = await getTranslations("dashboard");
@@ -20,6 +23,13 @@ export default async function DashboardPage() {
     .order("created_at");
 
   const apps = profile.role === "student" ? await getMyApplications(user.id) : [];
+  // Менеджеру и админу — сводка по их программам
+  let staffStats = null;
+  if (profile.role !== "student") {
+    const [stats, managed] = await Promise.all([getStats(supabase), getManagedPrograms(user.id, profile.role === "admin")]);
+    const ids = new Set(managed.map((p) => p.id));
+    staffStats = { ...stats, byProgram: stats.byProgram.filter((p) => ids.has(p.id)) };
+  }
   const firstName = profile.full_name?.split(/\s+/)[0] ?? "";
   const percent = profileCompleteness(profile);
 
@@ -32,9 +42,7 @@ export default async function DashboardPage() {
         <p className="mt-1.5 text-fg-muted">{t("subtitle")}</p>
       </section>
 
-      {profile.role !== "student" && (
-        <Card className="border-dashed text-sm text-fg-muted">{t("staffNote")}</Card>
-      )}
+      {profile.role !== "student" && staffStats && <StatsView stats={staffStats} />}
 
       {!!enrollments?.length && (
         <section>
@@ -63,7 +71,7 @@ export default async function DashboardPage() {
 
       {profile.role === "student" && <MyApplications apps={apps} />}
 
-      <div className="grid gap-3 md:grid-cols-2">
+      {profile.role === "student" && <div className="grid gap-3 md:grid-cols-2">
         <Card className="flex items-start gap-3">
           <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-route-soft text-route">
             <Compass className="size-5" aria-hidden />
@@ -87,7 +95,7 @@ export default async function DashboardPage() {
             </Link>
           )}
         </Card>
-      </div>
+      </div>}
     </div>
   );
 }

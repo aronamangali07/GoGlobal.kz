@@ -1,7 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database, Json } from "@/lib/supabase/database.types";
-import { allocate, newSeed, offerWorkTypes } from "./allocate";
+import { allocate, DEFAULT_WEIGHTS, newSeed, offerWorkTypes, type Weights } from "./allocate";
 
 type Db = SupabaseClient<Database>;
 
@@ -22,6 +22,8 @@ export async function runAllocationDraft(db: Db, offerId: string, runBy: string 
   if (error) throw new Error(error.message);
   const pending = (inputs ?? []).filter((i) => i.status === "pending");
 
+  const { data: setting } = await db.from("app_settings").select("value").eq("key", "allocation").maybeSingle();
+  const weights: Weights = { ...DEFAULT_WEIGHTS, ...((setting?.value ?? {}) as Partial<Weights>) };
   const seed = newSeed();
   const fields = (offer.fields ?? {}) as Record<string, unknown>;
   const params = {
@@ -45,6 +47,7 @@ export async function runAllocationDraft(db: Db, offerId: string, runBy: string 
       hasPlaceElsewhere: i.has_place_elsewhere,
     })),
     seed,
+    weights,
   );
   // В ручном режиме система ничего не выбирает сама — только проверяет требования
   if (offer.allocation_mode === "manual") ranked.forEach((r) => r.eligible && (r.outcome = "waitlisted"));
@@ -54,7 +57,7 @@ export async function runAllocationDraft(db: Db, offerId: string, runBy: string 
     .insert({
       offer_id: offerId,
       seed,
-      params: { ...params, at: params.at.toISOString(), mode: offer.allocation_mode } as unknown as Json,
+      params: { ...params, at: params.at.toISOString(), mode: offer.allocation_mode, weights } as unknown as Json,
       result: ranked as unknown as Json,
       run_by: runBy,
     })

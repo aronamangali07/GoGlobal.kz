@@ -36,6 +36,10 @@ export type OfferForAllocation = {
 
 export type Reason = "program" | "english" | "age";
 
+/** Настраиваемые админом веса (app_settings.allocation). */
+export type Weights = { country: number; work: number; noPlacePriority: boolean };
+export const DEFAULT_WEIGHTS: Weights = { country: 0.5, work: 0.5, noPlacePriority: true };
+
 export type Ranked = {
   application_id: string;
   user_id: string;
@@ -103,24 +107,24 @@ export function checkCandidate(c: Candidate, o: OfferForAllocation): Reason[] {
   return failed;
 }
 
-export function matchScore(c: Candidate, o: OfferForAllocation) {
+export function matchScore(c: Candidate, o: OfferForAllocation, w: Weights = DEFAULT_WEIGHTS) {
   const countries = c.preferences?.countries ?? [];
   const works = c.preferences?.workTypes ?? [];
   // Не указал пожелания или «не важно» — нейтрально (0.5), совпало — 1, не совпало — 0
   const countryScore = !countries.length || countries.includes("any") ? 0.5 : countries.includes(o.country) ? 1 : 0;
   const workScore = !works.length ? 0.5 : works.some((w) => o.workTypes.includes(w)) ? 1 : 0;
   return {
-    score: Math.round(((countryScore + workScore) / 2) * 100) / 100,
+    score: w.country + w.work > 0 ? Math.round(((countryScore * w.country + workScore * w.work) / (w.country + w.work)) * 100) / 100 : 0,
     countryMatch: countryScore === 1,
     workMatch: workScore === 1,
   };
 }
 
-export async function allocate(o: OfferForAllocation, candidates: Candidate[], seed: string): Promise<Ranked[]> {
+export async function allocate(o: OfferForAllocation, candidates: Candidate[], seed: string, w: Weights = DEFAULT_WEIGHTS): Promise<Ranked[]> {
   const rows = await Promise.all(
     candidates.map(async (c) => {
       const failed = checkCandidate(c, o);
-      const m = matchScore(c, o);
+      const m = matchScore(c, o, w);
       return {
         application_id: c.applicationId,
         user_id: c.userId,
@@ -141,7 +145,7 @@ export async function allocate(o: OfferForAllocation, candidates: Candidate[], s
     (a, b) =>
       Number(b.eligible) - Number(a.eligible) ||
       b.match - a.match ||
-      Number(a.has_place) - Number(b.has_place) ||
+      (w.noPlacePriority ? Number(a.has_place) - Number(b.has_place) : 0) ||
       (a.ticket < b.ticket ? -1 : a.ticket > b.ticket ? 1 : 0),
   );
 

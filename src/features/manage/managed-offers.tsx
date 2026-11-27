@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { Archive, ArchiveRestore, Clock, Eye, Megaphone, Pencil, Plus, Users } from "lucide-react";
+import { Archive, ArchiveRestore, Clock, Eye, Megaphone, Pencil, Plus, Trash2, Users } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
@@ -15,6 +15,7 @@ import { windowState, type OfferWithProgram } from "@/features/offers/types";
 import { COUNTRY_FLAGS } from "@/features/profile/constants";
 import { cn } from "@/lib/utils";
 import { setOfferArchived } from "./actions";
+import { deleteOffer } from "@/features/admin/actions";
 
 type Tab = "active" | "draft" | "closed" | "archived";
 
@@ -29,13 +30,16 @@ function tabOf(o: OfferWithProgram): Tab {
 export function ManagedOffers({
   offers,
   counts,
+  isAdmin = false,
 }: {
   offers: OfferWithProgram[];
   counts: Record<string, { applicants: number; taken: number }>;
+  isAdmin?: boolean;
 }) {
   const t = useTranslations("manage");
   const to = useTranslations("offers");
   const ta = useTranslations("allocation");
+  const tad = useTranslations("admin");
   const [tab, setTab] = useState<Tab>("active");
   const [pending, start] = useTransition();
   const byTab = (x: Tab) => offers.filter((o) => tabOf(o) === x);
@@ -127,6 +131,15 @@ export function ManagedOffers({
                     })}>
                     {s === "archived" ? <><ArchiveRestore className="size-4" aria-hidden /> {t("unarchive")}</> : <><Archive className="size-4" aria-hidden /> {t("archive")}</>}
                   </Button>
+                  {isAdmin && s === "archived" && (
+                    <Button size="sm" variant="ghost" disabled={pending} className="text-danger"
+                      onClick={() => confirm(tad("deleteOfferConfirm")) && start(async () => {
+                        const res = await deleteOffer(o.id);
+                        if (res.ok) toast.success(tad("offerDeleted"));
+                      })}>
+                      <Trash2 className="size-4" aria-hidden /> {tad("deleteOffer")}
+                    </Button>
+                  )}
                 </div>
               </motion.div>
             );
