@@ -23,10 +23,8 @@ async function must<T>(p: PromiseLike<{ data: T; error: unknown }>, what: string
 async function ensureUser(email: string) {
   const { data } = await db.auth.admin.listUsers({ perPage: 1000 });
   const found = data.users.find((u) => u.email === email);
-  if (found) {
-    await db.auth.admin.updateUserById(found.id, { password: DEMO_PASSWORD, email_confirm: true });
-    return found.id;
-  }
+  // Пароль у существующих не трогаем: его смена отзывает открытые сессии в браузерах
+  if (found) return found.id;
   const created = await must(db.auth.admin.createUser({ email, password: DEMO_PASSWORD, email_confirm: true }), `user ${email}`);
   return created.user.id;
 }

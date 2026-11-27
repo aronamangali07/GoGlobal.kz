@@ -22,9 +22,11 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  // Важно: ничего не вызывать между createServerClient и getClaims.
-  const { data } = await supabase.auth.getClaims();
-  const signedIn = Boolean(data?.claims);
+  // Важно: ничего не вызывать между createServerClient и getUser.
+  // getUser сверяется с сервером Supabase: отозванная сессия (выход на другом устройстве,
+  // смена пароля, удаление аккаунта) сразу считается невалидной — без петли редиректов.
+  const { data, error } = await supabase.auth.getUser();
+  const signedIn = Boolean(data?.user) && !error;
   const { pathname } = request.nextUrl;
   const isPublic = pathname === "/" || PUBLIC_PATHS.some((p) => pathname.startsWith(p));
 

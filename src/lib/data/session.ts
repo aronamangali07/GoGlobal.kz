@@ -21,7 +21,8 @@ export const getSession = cache(async () => {
 
 export async function requireSession() {
   const session = await getSession();
-  if (!session) redirect("/login");
+  // Через /auth/signout, чтобы стереть куки битой сессии: иначе прокси вернёт на /dashboard
+  if (!session) redirect("/auth/signout");
   return session;
 }
 
