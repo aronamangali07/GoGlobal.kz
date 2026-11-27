@@ -46,6 +46,8 @@ export function DocumentChecklist({ userId, items }: { userId: string; items: Ch
   const t = useTranslations("documents");
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
+  // Мгновенно показываем «На проверке», не дожидаясь обновления страницы с сервера
+  const [optimistic, setOptimistic] = useState<Record<string, { fileName: string }>>({});
   const inputRef = useRef<HTMLInputElement>(null);
   const target = useRef<string | null>(null);
 
@@ -65,6 +67,7 @@ export function DocumentChecklist({ userId, items }: { userId: string; items: Ch
       if (error) throw error;
       const res = await registerDocument({ documentTypeId: typeId, path, name: file.name, mime: file.type, size: file.size });
       if (!res.ok) throw new Error(res.error);
+      setOptimistic((o) => ({ ...o, [typeId]: { fileName: file.name } }));
       toast.success(t("uploaded"));
       router.refresh();
     } catch {
@@ -89,7 +92,11 @@ export function DocumentChecklist({ userId, items }: { userId: string; items: Ch
       </Card>
 
       <ul className="flex flex-col gap-2.5">
-        {items.map((it, i) => {
+        {items.map((raw, i) => {
+          const o = optimistic[raw.typeId];
+          const it: ChecklistItem = o
+            ? { ...raw, doc: { id: raw.doc?.id ?? "", comment: "", status: "pending", fileName: o.fileName } }
+            : raw;
           const s = it.doc ? STATUS[it.doc.status] : null;
           const Icon = s?.icon ?? CircleDashed;
           const loading = busy === it.typeId;
@@ -125,7 +132,7 @@ export function DocumentChecklist({ userId, items }: { userId: string; items: Ch
                     onClick={() => { target.current = it.typeId; inputRef.current?.click(); }}>
                     {!loading && <Upload className="size-4" aria-hidden />} {loading ? t("uploading") : it.doc ? t("replace") : t("upload")}
                   </Button>
-                  {it.doc && <OpenDocument id={it.doc.id} label={t("view")} />}
+                  {it.doc?.id && <OpenDocument id={it.doc.id} label={t("view")} />}
                 </div>
               )}
               {it.doc?.status === "accepted" && <div className="mt-2"><OpenDocument id={it.doc.id} label={t("view")} /></div>}
