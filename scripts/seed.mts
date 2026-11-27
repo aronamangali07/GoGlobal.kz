@@ -343,6 +343,23 @@ await applyMany("Namsan Grand Hotel", ["aigerim", "timur", "zhanel", "alikhan", 
     [studentId, "Здравствуйте! Подскажите, когда будет интервью по офферу A2?", 3],
     [managerId, "Добрый день! Работодатель обещал на следующей неделе, точную дату пришлём в календарь.", 2],
   ]);
+  // Колокольчик и объявление — чтобы на показе было что открыть (только in-app, без писем)
+  const demoUsers = Object.values(U).concat([managerId, adminId]);
+  await must(db.from("notifications").delete().in("user_id", demoUsers), "reset notifications");
+  await must(db.from("announcements").delete().eq("created_by", adminId), "reset announcements");
+  const { data: a2 } = await db.from("offers").select("id").eq("code", "A2").single();
+  await must(db.from("announcements").insert({ program_id: P["work-and-travel"], created_by: adminId,
+    title: "Собрание по Work and Travel — суббота, 12:00",
+    body: "Расскажем про интервью с работодателями и сроки посольства. Офис GoGlobal или онлайн по ссылке в чате." }), "announcement");
+  await must(db.from("notifications").insert([
+    { user_id: studentId, type: "application.selected", title: "Место ваше! 🎉 — Namsan Grand Hotel", body: "Поздравляем — вы получили место. Менеджер свяжется с вами насчёт интервью.", link: `/offers/${offerIds["Namsan Grand Hotel"]}`, created_at: iso(now - 50 * H), read_at: iso(now - 49 * H) },
+    { user_id: studentId, type: "document.rework", title: "Нужно переделать: Справка с места учёбы", body: "Комментарий менеджера: нужна справка с печатью университета", link: "/documents", created_at: iso(now - 20 * H) },
+    { user_id: studentId, type: "event.scheduled", title: "Запись в посольство: собеседование в консульстве", body: "Через 10 дней, 10:00 · Алматы", link: "/calendar", created_at: iso(now - 18 * H) },
+    { user_id: studentId, type: "announcement", title: "Собрание по Work and Travel — суббота, 12:00", body: "Расскажем про интервью с работодателями и сроки посольства.", link: "/dashboard", created_at: iso(now - 3 * H) },
+    { user_id: studentId, type: "offer.new", title: "Новый оффер: A2 · Restaurant Attendant", body: "Landry's Rainforest Cafe, Galveston, TX · 3 места", link: `/offers/${a2!.id}`, created_at: iso(now - 1 * H) },
+    { user_id: managerId, type: "offer.window_closed", title: "Окно закрылось: Camp Silver Lake · Кухня", body: "Заявок: 4. Черновик распределения готов — проверьте и подтвердите.", link: `/manage/offers/${offerIds["Camp Silver Lake"]}/applications`, created_at: iso(now - 26 * H) },
+    { user_id: managerId, type: "document.uploaded", title: "Документ на проверку: Загранпаспорт", body: "Мадина Ахметова загрузила документ.", link: `/manage/students/${U.madina}`, created_at: iso(now - 4 * H) },
+  ]), "notifications");
   console.log("✓ Путь, события, документы, оплаты и сообщения");
 }
 

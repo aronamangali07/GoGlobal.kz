@@ -1,98 +1,150 @@
 # GoGlobal.kz
 
-Платформа агентства международных программ для студентов из Казахстана: Work and Travel, Au Pair, Internship/Trainee, Camp Counselor.
-Вместо гонки в WhatsApp-чате — честное распределение офферов, личные кабинеты и уведомления на почту и в Telegram.
+Платформа агентства международных программ для студентов из Казахстана: **Work and Travel, Au Pair, Internship / Trainee, Camp Counselor** (админ может добавлять новые).
 
-**Стек:** Next.js 16 (App Router) · TypeScript · Tailwind CSS 4 · Motion (Framer Motion) · Supabase · Resend · grammY · Vercel
+Вместо гонки «кто первый написал» в WhatsApp-чате на 150 человек — **честное распределение мест**, личные кабинеты и уведомления **на почту и в Telegram**.
 
-## Быстрый старт
+**Демо:** https://goglobal-kz.vercel.app
 
-```bash
-npm install
-cp .env.example .env.local   # заполнить ключи (см. ниже)
-npm run dev                  # http://localhost:3000
-```
+---
 
-Без ключей Supabase экран входа открывается и анимируется, но войти нельзя: появится подсказка «База данных ещё не подключена».
+## Демо-доступ
 
-| Страница | Что там |
-|---|---|
-| `/login`, `/register` | Вход и регистрация: глобус с маршрутами, magic link |
-| `/design` | Витрина дизайн-системы: цвета, кнопки, поля, скелетоны, тост, конфетти |
-| `/dashboard` | Временный кабинет (до этапа 3) |
+На странице входа есть блок **«Демо-доступ»** — вход одним нажатием. Или вручную, пароль у всех `GoGlobal2026!`:
 
-## Подключение Supabase
-
-1. Зарегистрируйтесь на https://supabase.com → **New project**. Регион: Frankfurt (eu-central-1) — ближе всего к Казахстану. Сохраните пароль базы.
-2. **Project Settings → API Keys**: скопируйте в `.env.local`
-   - Project URL → `NEXT_PUBLIC_SUPABASE_URL`
-   - Publishable key → `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-   - Secret key → `SUPABASE_SECRET_KEY` (только на сервере, никому не показывать)
-3. **SQL Editor → New query**: по очереди выполните все файлы из `supabase/migrations/` (0001, 0002, …) → **Run**.
-   Или задайте `SUPABASE_ACCESS_TOKEN` и `SUPABASE_PROJECT_REF` в `.env.local` и запустите `npm run db:run -- supabase/migrations/*.sql`.
-4. **Authentication → URL Configuration**:
-   - Site URL: `http://localhost:3000` (после деплоя — адрес на Vercel)
-   - Redirect URLs: добавьте `http://localhost:3000/auth/callback`
-5. Для демо: **Authentication → Sign In / Providers → Email** — выключите *Confirm email*, чтобы входить сразу после регистрации.
-   Встроенная почта Supabase шлёт ~2 письма в час; на этапе 7 подключим Resend как SMTP.
-
-## Структура
-
-```
-src/
-  app/(auth)        экраны входа и регистрации
-  app/(app)         кабинет (переходы страниц — template.tsx)
-  app/auth/callback обработка ссылок из писем
-  components/ui     дизайн-система
-  components/globe  глобус (canvas + d3-geo), точки суши — scripts/gen-globe-dots.mjs
-  features/         модули по функциональности (auth, offers, allocation, …)
-  lib/supabase      клиенты: браузер / сервер / admin / proxy
-  i18n/, messages/  переводы (ru; kk и en — добавить файл в messages/)
-supabase/migrations SQL-миграции
-```
-
-## Уведомления (этап 7)
-
-Каждое событие — в колокольчик на сайте, на почту (Resend) и в Telegram (бот на webhook), по настройкам пользователя.
-Очередь доставки `notification_deliveries` с уникальным `dedupe_key` — одно и то же не уйдёт дважды.
-
-| Переменная | Где взять |
-|---|---|
-| `RESEND_API_KEY` | resend.com → API Keys |
-| `EMAIL_OVERRIDE_TO` | Демо без своего домена: все письма уходят на почту владельца Resend (в письме указано, кому оно) |
-| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME` | @BotFather → /newbot |
-| `TELEGRAM_WEBHOOK_SECRET` | любая случайная строка; та же передаётся в `setWebhook` |
-| `CRON_SECRET` | случайная строка; в Supabase Vault под именем `cron_secret` |
-
-Webhook бота: `https://api.telegram.org/bot<TOKEN>/setWebhook?url=<SITE>/api/telegram/webhook&secret_token=<TELEGRAM_WEBHOOK_SECRET>`.
-Крон: `supabase/migrations/0009_cron_schedule.sql` (pg_cron каждые 15 минут → `/api/cron/tick`): закрытие окон, черновики распределения, напоминания за 24 ч и 1 ч, сроки оплат, повтор неудачных доставок.
-
-## Безопасность
-
-- Все ключи только в `.env.local` (в git не попадает). Шаблон — `.env.example`.
-- Доступ к данным — через Row Level Security в Postgres.
-
-## Демо
-
-**Сайт:** https://goglobal-kz.vercel.app
-
-| Роль | Email | Пароль |
+| Роль | Email | Что видит |
 |---|---|---|
-| Студент | student@demo.goglobal.kz | GoGlobal2026! |
-| Менеджер (Work and Travel, Camp Counselor) | manager@demo.goglobal.kz | GoGlobal2026! |
-| Админ | admin@demo.goglobal.kz | GoGlobal2026! |
+| Студент | `student@demo.goglobal.kz` | Айгерим Нурланова, B2, 22 года. Work and Travel, Internship, Camp Counselor |
+| Менеджер | `manager@demo.goglobal.kz` | Данияр Сапаров. Только Work and Travel и Camp Counselor |
+| Админ | `admin@demo.goglobal.kz` | Основатель. Всё + админка |
 
-Перед показом обновите тестовые данные — окна офферов выставятся относительно текущего времени:
+Ещё 8 демо-студентов (Алихан, Дана, Тимур, Мадина, Арман, Жанель, Ерлан, Камила) подают заявки — чтобы было что распределять. Им письма не отправляются.
+
+Перед показом обновите данные (окна офферов выставятся от текущего момента, ваш собственный аккаунт не трогается):
 
 ```bash
 npm run seed
 ```
 
+## Сценарий показа основателю (≈10 минут)
+
+1. **Вход** — глобус, самолёт летит из Алматы по маршрутам программ. Переключите тему ☀/🌙.
+2. **Студент** (Демо-доступ → Студент):
+   - колокольчик: уведомления, нажмите любое;
+   - **Офферы** → фильтр «Подходят мне» → **A2 Landry's Rainforest Cafe** → калькулятор заработка → **«Хочу!»**;
+   - откройте **B7** — вторая заявка в программе заблокирована с объяснением;
+   - откройте **Namsan Grand Hotel** — «Место ваше!», конфетти, «Проверить мой билет» (жребий проверяется в браузере);
+   - **Мой путь** — уровни, обратный отсчёт до дедлайна; **Документы** — справка «Переделать» с комментарием; **Оплаты**; **Сообщения**.
+3. **Менеджер** (выйти → Демо-доступ → Менеджер):
+   - главная — сводка по его программам;
+   - **Офферы → A2 → Заявки → «Закрыть окно и распределить»** — анимация жребия, очередь с объяснением «почему такая позиция» → **«Подтвердить»**;
+   - **Camp Silver Lake** — черновик уже готов, покажите ручную правку «Дать место / Убрать»;
+   - **Студенты → Мадина** — назначить интервью, принять документ; **Рассылка**;
+   - **Новый оффер** — форма собирается из полей программы.
+4. Снова **студент** — на A2 его результат, в колокольчике уведомление (письмо пришло на почту владельца Resend, в Telegram — если бот подключён).
+5. **Админ**: **Админка** — дашборд, пользователи и роли, конструктор программ, настройки распределения, журнал действий, экспорт в Excel.
+
+## Возможности
+
+**Студент:** регистрация (email+пароль, magic link), онбординг из 6 шагов, лента офферов по своим программам (фильтры, поиск, избранное), карточка оффера с проверкой требований и калькулятором (W&T), «Хочу» (одна активная заявка на программу), «Мой путь» как уровни игры, календарь (.ics и подписка), документы по чек-листу, оплаты, чат с менеджером, уведомления и их настройки, подключение Telegram.
+
+**Менеджер:** офферы своих программ (динамическая форма по схеме программы, черновики, окно подачи, архив), заявки и распределение (досрочное закрытие окна, черновик, ручные правки, подтверждение, одобрить/отклонить/дать место из листа ожидания), студенты (смена этапа, интервью/посольство/дедлайны, проверка документов, оплаты), очередь документов, сообщения, рассылка.
+
+**Админ:** всё, что менеджер, по всем программам + дашборд статистики, пользователи и роли, назначение программ менеджерам, создание/закрытие программ (конструктор полей), настройки распределения, журнал действий, экспорт CSV, окончательное удаление.
+
+### Честное распределение
+
+После закрытия окна (по умолчанию 24 ч) очередь строится так:
+
+1. соответствие требованиям (английский, возраст, участие в программе) — жёсткий фильтр;
+2. совпадение с пожеланиями студента (страна + тип работы, веса задаёт админ);
+3. приоритет тем, у кого ещё нет места (включается в настройках);
+4. жребий: билет = `SHA-256("<зерно>:<id студента>")`, меньше — выше.
+
+**Время нажатия «Хочу» не участвует.** Зерно публикуется после подтверждения — любой участник может пересчитать свой билет. Менеджер видит результат как черновик, может поправить вручную (это отмечается в журнале) и подтверждает. Алгоритм покрыт тестами: `npm test`.
+
+## Стек
+
+Next.js 16 (App Router) · TypeScript · Tailwind CSS 4 · Motion (Framer Motion) · Supabase (Auth, Postgres + RLS, Storage, Realtime, pg_cron) · Resend + React Email · Telegram-бот на grammY (webhook) · Vercel.
+
+```
+src/
+  app/(auth)            вход, регистрация (глобус)
+  app/(app)/onboarding  онбординг
+  app/(app)/(shell)     кабинет: офферы, мой путь, календарь, документы, оплаты, сообщения, настройки
+  app/(app)/(shell)/manage   менеджер: офферы, заявки, студенты, документы, рассылка
+  app/(app)/(shell)/admin    админка
+  app/api               cron/tick, telegram/webhook, calendar/<token>.ics, admin/export
+  features/             модули по функциональности
+  lib/notify            уведомления: очередь, email, Telegram, события
+  lib/supabase          клиенты (браузер/сервер/admin/proxy) и типы базы
+messages/ru.json        все тексты интерфейса (kk/en — добавить файл)
+supabase/migrations     SQL-миграции 0001–0010 (таблицы, RLS, функции, крон)
+scripts/seed.mts        демо-данные
+tests/                  тесты распределения
+```
+
+## Запуск с нуля
+
+```bash
+npm install
+cp .env.example .env.local
+npm run dev
+```
+
+### 1. Supabase
+1. https://supabase.com → **New project** (регион Frankfurt или Ireland).
+2. **Project Settings → API Keys** → в `.env.local`: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`.
+3. Миграции: выполните файлы `supabase/migrations/0001…0010` по порядку в **SQL Editor** — или задайте `SUPABASE_ACCESS_TOKEN` (supabase.com/dashboard/account/tokens) и `SUPABASE_PROJECT_REF`, затем `npm run db:run -- supabase/migrations/*.sql`.
+4. **Authentication → URL Configuration**: Site URL = адрес сайта, Redirect URLs = `<сайт>/**`. Для демо: **Providers → Email → Confirm email** выключить.
+5. `npm run seed` — демо-аккаунты и данные.
+
+### 2. Resend (письма)
+resend.com → **API Keys** → `RESEND_API_KEY`. Без своего домена Resend отправляет только на почту владельца аккаунта — укажите её в `EMAIL_OVERRIDE_TO` (в письме будет видно, кому оно на самом деле). Со своим доменом: **Domains → Add**, DNS-записи, затем `EMAIL_FROM="GoGlobal <noreply@ваш-домен>"` и уберите `EMAIL_OVERRIDE_TO`.
+
+### 3. Telegram-бот
+@BotFather → `/newbot` → `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME`; `TELEGRAM_WEBHOOK_SECRET` — любая случайная строка. После деплоя:
+
+```bash
+curl "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/setWebhook" -d "url=https://<сайт>/api/telegram/webhook" -d "secret_token=$TELEGRAM_WEBHOOK_SECRET"
+```
+
+### 4. Vercel
+Импортируйте репозиторий, перенесите переменные из `.env.local` (кроме `SUPABASE_ACCESS_TOKEN`), регион функций — ближе к базе (`dub1` для Ireland). `NEXT_PUBLIC_SITE_URL` = адрес на Vercel.
+
+### 5. Крон каждые 15 минут
+Vercel Hobby разрешает cron только раз в сутки, поэтому расписание живёт в Supabase (pg_cron + pg_net):
+
+```sql
+select vault.create_secret('<CRON_SECRET>', 'cron_secret');
+```
+
+затем миграция `0009_cron_schedule.sql` (замените адрес сайта). Задача вызывает `/api/cron/tick`: закрывает окна, готовит черновики распределения, шлёт напоминания за 24 ч и 1 ч, о сроках оплат, повторяет неудавшиеся отправки. Ежедневный Vercel Cron (`vercel.json`) — подстраховка.
+
+### Перед запуском для реальных студентов
+- `NEXT_PUBLIC_DEMO_MODE=false` — убрать кнопки демо-входа;
+- включить подтверждение email в Supabase и подключить свой домен в Resend (SMTP Supabase → Resend);
+- удалить демо-аккаунты (Админка → Пользователи) и тестовые офферы (помечены «Тест»).
+
 ## Скрипты
 
 | Команда | Что делает |
 |---|---|
-| `npm run dev` | локальный сервер |
-| `npm run seed` | демо-аккаунты и 10 офферов (A2 — реальный пример, остальные помечены как тестовые) |
-| `npm run db:run -- <file.sql>` | выполнить SQL-миграцию через Supabase Management API |
-| `npm run db:types` | перегенерировать TypeScript-типы базы |
+| `npm run dev` / `build` / `start` | разработка / сборка / прод |
+| `npm run lint`, `npm run typecheck` | проверки |
+| `npm test` | тесты честного распределения |
+| `npm run seed` | демо-данные (повторный запуск — сброс демо) |
+| `npm run db:run -- <file.sql>` | выполнить SQL через Supabase Management API |
+| `npm run db:types` | типы базы для TypeScript |
+
+## Безопасность
+
+- Все ключи — только в `.env.local` и переменных Vercel; в git — шаблон `.env.example`.
+- Доступ к данным — **Row Level Security** в Postgres: студент видит только своё, менеджер — свои программы, админ — всё. Критичные действия (заявка, распределение, решения) — `SECURITY DEFINER`-функции с проверками внутри базы; роль нельзя повысить самому себе.
+- Файлы (фото, документы) — в приватных бакетах, выдаются по временным ссылкам.
+- Журнал действий нельзя изменить или удалить.
+- Вебхук Telegram проверяет секрет; токены привязки одноразовые, в базе хранится только хэш; крон защищён `CRON_SECRET`.
+
+## Языки
+
+Все тексты — в `messages/ru.json` (next-intl). Чтобы добавить казахский или английский: создать `messages/kk.json` / `en.json` и убрать язык из `unavailableLocales` в `src/i18n/config.ts`; у программ есть поле `translations` для переводов названий.

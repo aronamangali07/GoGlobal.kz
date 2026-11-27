@@ -82,3 +82,22 @@ export async function signOut() {
   }
   redirect("/login");
 }
+
+const DEMO_ACCOUNTS = {
+  student: "student@demo.goglobal.kz",
+  manager: "manager@demo.goglobal.kz",
+  admin: "admin@demo.goglobal.kz",
+} as const;
+
+/** Вход в демо-аккаунт одной кнопкой. Работает только при NEXT_PUBLIC_DEMO_MODE=true. */
+export async function demoSignIn(role: keyof typeof DEMO_ACCOUNTS): Promise<AuthResult> {
+  if (process.env.NEXT_PUBLIC_DEMO_MODE !== "true" || !process.env.DEMO_PASSWORD) return { ok: false, error: "generic" };
+  if (!isSupabaseConfigured) return { ok: false, error: "notConfigured" };
+  const email = DEMO_ACCOUNTS[role];
+  if (!email) return { ok: false, error: "generic" };
+  const supabase = await createClient();
+  await supabase.auth.signOut({ scope: "local" }).catch(() => {});
+  const { error } = await supabase.auth.signInWithPassword({ email, password: process.env.DEMO_PASSWORD });
+  if (error) return { ok: false, error: mapError(error) };
+  return { ok: true, kind: "signed-in" };
+}

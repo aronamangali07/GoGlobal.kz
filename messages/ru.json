@@ -99,6 +99,16 @@
       "notConfigured": "База данных ещё не подключена: добавьте ключи Supabase в .env.local",
       "callback": "Ссылка устарела или уже использована. Запросите новую",
       "generic": "Что-то пошло не так. Попробуйте ещё раз"
+    },
+    "demo": {
+      "title": "Демо-доступ",
+      "subtitle": "Войти одним нажатием, без пароля",
+      "student": "Студент",
+      "manager": "Менеджер",
+      "admin": "Админ",
+      "studentHint": "Айгерим, W&T · Internship",
+      "managerHint": "W&T · Camp",
+      "adminHint": "Все программы"
     }
   },
   "dashboard": {

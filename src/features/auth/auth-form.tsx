@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { sendMagicLink, signInWithPassword, signUp } from "./actions";
+import { DemoAccess } from "./demo-access";
 import { loginSchema, magicLinkSchema, registerSchema, type AuthErrorCode } from "./schema";
 
 type Mode = "login" | "register";
@@ -200,6 +201,7 @@ export function AuthForm({ mode, initialError }: { mode: Mode; initialError?: "c
         )}
 
         {mode === "register" && <p className="mt-5 text-center text-xs leading-relaxed text-fg-subtle">{t("terms")}</p>}
+        {mode === "login" && <DemoAccess />}
       </motion.div>
     </AnimatePresence>
   );
