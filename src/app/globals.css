@@ -1,0 +1,161 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============ Дизайн-токены GoGlobal ============
+   Тема «небо»: глубокий индиго, бирюзовые маршруты, тёплый рассветный акцент. */
+:root {
+  --bg: #f5f7fc;
+  --bg-elevated: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #eef2fa;
+  --surface-3: #e3e9f5;
+  --fg: #0b1430;
+  --fg-muted: #56627f;
+  --fg-subtle: #8a94ad;
+  --border: #dde4f1;
+  --border-strong: #c7d1e5;
+  --ring: #3b5bfd;
+
+  --primary: #3552f2;
+  --primary-hover: #2a45dc;
+  --primary-fg: #ffffff;
+  --primary-soft: #e6ebff;
+
+  --route: #0fb5ad;
+  --route-soft: #dcf7f5;
+  --accent: #ff7a2f;
+  --accent-soft: #fff0e6;
+
+  --success: #12a150;
+  --success-soft: #e3f7ec;
+  --warning: #d98a00;
+  --warning-soft: #fff4dc;
+  --danger: #e0444c;
+  --danger-soft: #fdeaeb;
+
+  --shadow-color: 222 60% 30%;
+  --radius: 1rem;
+}
+
+.dark {
+  --bg: #050a1c;
+  --bg-elevated: #0a1129;
+  --surface: #0c1430;
+  --surface-2: #121c3e;
+  --surface-3: #1a2650;
+  --fg: #e9eeff;
+  --fg-muted: #9aa6c8;
+  --fg-subtle: #6a779c;
+  --border: #1c2850;
+  --border-strong: #2a3868;
+  --ring: #7b96ff;
+
+  --primary: #6d8bff;
+  --primary-hover: #8aa2ff;
+  --primary-fg: #050a1c;
+  --primary-soft: #18245a;
+
+  --route: #2de2d6;
+  --route-soft: #0c3340;
+  --accent: #ff9a52;
+  --accent-soft: #3a2111;
+
+  --success: #34d27b;
+  --success-soft: #0d3322;
+  --warning: #ffbf3c;
+  --warning-soft: #3a2c0b;
+  --danger: #ff6b72;
+  --danger-soft: #3d1419;
+
+  --shadow-color: 230 80% 2%;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-ring: var(--ring);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-fg: var(--primary-fg);
+  --color-primary-soft: var(--primary-soft);
+  --color-route: var(--route);
+  --color-route-soft: var(--route-soft);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-unbounded), var(--font-manrope), ui-sans-serif, sans-serif;
+
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.5);
+
+  --shadow-soft: 0 1px 2px hsl(var(--shadow-color) / 0.06), 0 8px 24px -8px hsl(var(--shadow-color) / 0.18);
+  --shadow-lift: 0 2px 4px hsl(var(--shadow-color) / 0.08), 0 24px 48px -16px hsl(var(--shadow-color) / 0.35);
+
+  --animate-shimmer: shimmer 1.6s ease-in-out infinite;
+  --animate-float: float 6s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    text-size-adjust: 100%;
+  }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--primary) 30%, transparent);
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+}
+
+/* Уважаем системную настройку «уменьшить движение» */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
